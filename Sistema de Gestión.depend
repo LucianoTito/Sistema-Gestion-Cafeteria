@@ -1,0 +1,244 @@
+# depslib dependency file v1.0
+1761199430 source:d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\código - sistema de gestión\sistema de gestión\main.cpp
+	<iostream>
+	"Fecha.h"
+
+1761199410 d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\código - sistema de gestión\sistema de gestión\fecha.h
+
+1761197643 source:d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\código - sistema de gestión\sistema de gestión\fecha.cpp
+	<iostream>
+	"Fecha.h"
+
+1761411427 source:d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\código - sistema de gestión\sistema de gestión\persona.cpp
+	<iostream>
+	<cstring>
+	<cstdio>
+	"Persona.h"
+
+1761278982 d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\código - sistema de gestión\sistema de gestión\persona.h
+
+1761408793 source:d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\código - sistema de gestión\sistema de gestión\producto.cpp
+	<iostream>
+	<cstring>
+	<cstdio>
+	"Producto.h"
+
+1761278926 d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\código - sistema de gestión\sistema de gestión\producto.h
+	<cstring>
+
+1761513641 source:d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\código - sistema de gestión\sistema de gestión\cliente.cpp
+	<iostream>
+	<cstring>
+	<cstdio>
+	"Cliente.h"
+
+1761428202 d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\código - sistema de gestión\sistema de gestión\cliente.h
+	"Persona.h"
+
+1761516078 source:d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\código - sistema de gestión\sistema de gestión\empleado.cpp
+	<iostream>
+	<cstring>
+	<cstdio>
+	"Empleado.h"
+
+1761516880 d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\código - sistema de gestión\sistema de gestión\empleado.h
+	"Persona.h"
+
+1761620486 source:d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\código - sistema de gestión\sistema de gestión\pedido.cpp
+	<iostream>
+	<cstring>
+	<cstdio>
+	"Pedido.h"
+	"Fecha.h"
+
+1761619311 d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\código - sistema de gestión\sistema de gestión\pedido.h
+	"Fecha.h"
+
+1761623402 source:d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\código - sistema de gestión\sistema de gestión\detallepedido.cpp
+	<iostream>
+	"DetallePedido.h"
+
+1761613503 d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\código - sistema de gestión\sistema de gestión\detallepedido.h
+
+1762650090 source:d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\código - sistema de gestión\sistema de gestión\sources\entities\cliente.cpp
+	<iostream>
+	<cstring>
+	<cstdio>
+	"../../Headers/Entities/Cliente.h"
+
+1762042430 d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\código - sistema de gestión\sistema de gestión\headers\entities\cliente.h
+	"Persona.h"
+
+1762041727 d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\código - sistema de gestión\sistema de gestión\headers\entities\persona.h
+
+1762650038 source:d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\código - sistema de gestión\sistema de gestión\sources\entities\detallepedido.cpp
+	<iostream>
+	"../../Headers/Entities/DetallePedido.h"
+
+1762406799 d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\código - sistema de gestión\sistema de gestión\headers\entities\detallepedido.h
+
+1762042982 source:d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\código - sistema de gestión\sistema de gestión\sources\entities\empleado.cpp
+	<iostream>
+	<cstring>
+	<cstdio>
+	"../../Headers/Entities/Empleado.h"
+
+1762042906 d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\código - sistema de gestión\sistema de gestión\headers\entities\empleado.h
+	"Persona.h"
+
+1762649834 source:d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\código - sistema de gestión\sistema de gestión\sources\entities\fecha.cpp
+	<iostream>
+	"../../Headers/Entities/Fecha.h"
+
+1762643744 d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\código - sistema de gestión\sistema de gestión\headers\entities\fecha.h
+
+1762650010 source:d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\código - sistema de gestión\sistema de gestión\sources\entities\pagos.cpp
+	<iostream>
+	<cstdio>
+	"../../Headers/Entities/Pagos.h"
+	"../../Headers/Entities/Fecha.h"
+
+1762228746 d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\código - sistema de gestión\sistema de gestión\headers\entities\pagos.h
+	"Fecha.h"
+
+1762649971 source:d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\código - sistema de gestión\sistema de gestión\sources\entities\pedido.cpp
+	<iostream>
+	<cstring>
+	<cstdio>
+	"../../Headers/Entities/Fecha.h"
+	"../../Headers/Entities/Pedido.h"
+
+1761959072 d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\código - sistema de gestión\sistema de gestión\headers\entities\pedido.h
+	"Fecha.h"
+
+1762649891 source:d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\código - sistema de gestión\sistema de gestión\sources\entities\persona.cpp
+	<iostream>
+	<cstring>
+	<cstdio>
+	"../../Headers/Entities/Persona.h"
+
+1762649929 source:d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\código - sistema de gestión\sistema de gestión\sources\entities\producto.cpp
+	<iostream>
+	<cstring>
+	<cstdio>
+	"../../Headers/Entities/Producto.h"
+
+1762012793 d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\código - sistema de gestión\sistema de gestión\headers\entities\producto.h
+	<cstring>
+
+1762644483 source:d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\código - sistema de gestión\sistema de gestión\sources\main.cpp
+	<iostream>
+	<cstring>
+	<locale.h>
+	"../Headers/UI/menus.h"
+
+1762134811 source:d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\código - sistema de gestión\sistema de gestión\sources\persistence\archivoproducto.cpp
+	<iostream>
+	<string>
+	<cstdio>
+	"../../Headers/Persistence/ArchivoProducto.h"
+	"../../Headers/Entities/Producto.h"
+
+1761711865 d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\código - sistema de gestión\sistema de gestión\headers\persistence\archivoproducto.h
+	<string>
+	"../Entities/Producto.h"
+
+1761800144 source:d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\código - sistema de gestión\sistema de gestión\sources\persistence\archivocliente.cpp
+	<iostream>
+	<string>
+	<cstdio>
+	"../../Headers/Persistence/ArchivoCliente.h"
+	"../../Headers/Entities/Cliente.h"
+
+1761792047 d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\código - sistema de gestión\sistema de gestión\headers\persistence\archivocliente.h
+	<string>
+	"../Entities/Cliente.h"
+
+1761801031 source:d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\código - sistema de gestión\sistema de gestión\sources\persistence\archivoempleado.cpp
+	<iostream>
+	<string>
+	<cstdio>
+	"../../Headers/Persistence/ArchivoEmpleado.h"
+	"../../Headers/Entities/Empleado.h"
+
+1761801210 d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\código - sistema de gestión\sistema de gestión\headers\persistence\archivoempleado.h
+	<string>
+	"../Entities/Empleado.h"
+
+1761804837 source:d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\código - sistema de gestión\sistema de gestión\sources\persistence\archivopedido.cpp
+	<iostream>
+	<string>
+	<cstdio>
+	"../../Headers/Persistence/ArchivoPedido.h"
+	"../../Headers/Entities/Pedido.h"
+
+1761803429 d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\código - sistema de gestión\sistema de gestión\headers\persistence\archivopedido.h
+	<string>
+	"../Entities/Pedido.h"
+
+1761843442 source:d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\código - sistema de gestión\sistema de gestión\sources\persistence\archivodetallepedido.cpp
+	<iostream>
+	<string>
+	<cstdio>
+	"../../Headers/Persistence/ArchivoDetallePedido.h"
+	"../../Headers/Entities/DetallePedido.h"
+
+1761840574 d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\código - sistema de gestión\sistema de gestión\headers\persistence\archivodetallepedido.h
+	<string>
+	"../Entities/DetallePedido.h"
+
+1761847442 source:d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\código - sistema de gestión\sistema de gestión\sources\persistence\archivopagos.cpp
+	<iostream>
+	<string>
+	<cstdio>
+	"../../Headers/Entities/Pagos.h"
+	"../../Headers/Persistence/ArchivoPagos.h"
+
+1761845335 d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\código - sistema de gestión\sistema de gestión\headers\persistence\archivopagos.h
+	<string>
+	"../Entities/Pagos.h"
+
+1762650507 source:d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\código - sistema de gestión\sistema de gestión\sources\ui\menus.cpp
+	<iostream>
+	<cstdio>
+	"../../Headers/UI/menus.h"
+	"../../Headers/Entities/Producto.h"
+	"../../Headers/Persistence/ArchivoProducto.h"
+	"../../Headers/Entities/Cliente.h"
+	"../../Headers/Persistence/ArchivoCliente.h"
+	"../../Headers/Entities/Empleado.h"
+	"../../Headers/Persistence/ArchivoEmpleado.h"
+	"../../Headers/Entities/Pedido.h"
+	"../../Headers/Persistence/ArchivoPedido.h"
+	"../../Headers/Entities/DetallePedido.h"
+	"../../Headers/Persistence/ArchivoDetallePedido.h"
+	"../../Headers/Entities/Pagos.h"
+	"../../Headers/Persistence/ArchivoPagos.h"
+	"../../Headers/UI/reportes.h"
+
+1762704449 d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\código - sistema de gestión\sistema de gestión\headers\ui\menus.h
+
+1762205013 source:d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\código - sistema de gestión\sistema de gestión\sources\funciones.cpp
+	<iostream>
+
+1762554920 d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\código - sistema de gestión\sistema de gestión\headers\ui\reportes.h
+
+1762644036 source:d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\código - sistema de gestión\sistema de gestión\sources\ui\reportes.cpp
+	<iostream>
+	<cstdio>
+	"../../Headers/UI/reportes.h"
+	"../../Headers/Entities/Pedido.h"
+	"../../Headers/Entities/DetallePedido.h"
+	"../../Headers/Entities/Cliente.h"
+	"../../Headers/Entities/Empleado.h"
+	"../../Headers/Entities/Producto.h"
+	"../../Headers/Persistence/ArchivoPedido.h"
+	"../../Headers/Persistence/ArchivoDetallePedido.h"
+	"../../Headers/Persistence/ArchivoCliente.h"
+	"../../Headers/Persistence/ArchivoEmpleado.h"
+	"../../Headers/Persistence/ArchivoProducto.h"
+
+1762644458 source:d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\código - sistema de gestión\sistema de gestión\sources\testfecha.cpp
+	<iostream>
+	"../Headers/Entities/Fecha.h"
+

@@ -1,0 +1,110 @@
+#include <iostream>
+#include <cstdio>
+//#include "Pagos.h"
+#include "../../Headers/Entities/Pagos.h"
+//#include "Fecha.h"
+#include "../../Headers/Entities/Fecha.h"
+using namespace std;
+
+Pagos::Pagos (int idPago,
+              int idPedido,
+              Fecha fechaPago,
+              int metodoPago,
+              float montoPagado
+              )
+              :_idPago(idPago),
+               _idPedido(idPedido),
+               _fechaPago(fechaPago)
+               {
+                   setMetodoPago(metodoPago);
+                   setMontoPagado(montoPagado);
+               }
+//Getters
+int Pagos::getIdPago() { return _idPago; }
+int Pagos::getIdPedido() { return _idPedido;}
+Fecha Pagos::getFechaPago(){ return _fechaPago; }
+int Pagos::getMetodoPago() { return _metodoPago; }
+float Pagos::getMontoPagado() { return _montoPagado; }
+
+//Setters
+
+void Pagos::setFechaPago(Fecha fecha){
+_fechaPago= fecha;
+}
+void Pagos::setMetodoPago(int metodo) {
+
+    if (metodo >= 1 && metodo <= 3) {
+        _metodoPago = metodo;
+    } else {
+        cout << "Metodo de pago invalido. Se asignara 0 (Desconocido/Error)." << endl;
+        _metodoPago = 0;
+    }
+}
+void Pagos::setMontoPagado(float monto) {
+
+    if (monto >= 0.0f) {
+        _montoPagado = monto;
+    } else {
+        cout << "Monto pagado no puede ser negativo. Se asignara 0.0." << endl;
+        _montoPagado = 0.0f;
+    }
+}
+
+
+//Método cargar
+
+void Pagos::Cargar(int idPago, int idPedido, float montoAPagar){
+
+_idPago = idPago;
+_idPedido = idPedido;
+
+cout << "ID Pago asignado: " << _idPago << endl;
+cout << "ID Pedido asociado: " << _idPedido << endl;
+
+
+// Asigna el monto recibido
+    setMontoPagado(montoAPagar); // Usa el setter para validar (>= 0)
+    cout << "Monto a pagar asignado: $" << montoAPagar << endl;
+
+
+
+cout<< "Ingrese la fecha de pago: ";
+_fechaPago.Cargar();
+
+int metd;
+
+
+cout<< "Ingrese el método de pago: "<<endl;
+cin>> metd;
+setMetodoPago(metd);
+
+
+
+cout << "Pago cargado correctamente." << endl;
+
+}
+
+//Método mostrar
+
+void Pagos::Mostrar(){
+cout << "--- DATOS DEL PAGO ---" << endl;
+
+cout << "ID del Pago: "<<_idPago<<endl;
+cout << "ID del Pedido Asociado: "<<_idPedido<<endl;
+cout <<"Fecha pago : ";
+_fechaPago.Mostrar();
+cout << "Método Pago: ";
+
+    switch (_metodoPago) {
+        case 1: cout << "Efectivo"; break;
+        case 2: cout << "Tarjeta"; break;
+        case 3: cout << "Transferencia"; break;
+        default: cout << "Desconocido/Invalido"; break;
+    }
+    cout << endl;
+cout << "Monto a pagado: $"<<_montoPagado<<endl;
+cout << "--------------------------------" << endl;
+
+}
+
+

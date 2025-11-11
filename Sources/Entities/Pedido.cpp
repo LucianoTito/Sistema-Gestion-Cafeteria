@@ -1,0 +1,149 @@
+#include <iostream>
+#include <cstring>
+#include <cstdio>
+//#include "Pedido.h"
+//#include "Fecha.h"
+#include "../../Headers/Entities/Fecha.h"
+#include "../../Headers/Entities/Pedido.h"
+
+using namespace std;
+
+// Constructor
+Pedido::Pedido(int idPedido,
+               int idCliente,
+               int idEmpleado,
+               int nroMesa,
+               Fecha fecha,
+               float subtotal,
+               int porcentajeDesc,
+               int puntuacion,
+               bool eliminado)
+    : _idPedido(idPedido),
+      _idCliente(idCliente),
+      _idEmpleado(idEmpleado),
+      _fecha(fecha),
+      _eliminado(eliminado)
+{
+    setNroMesa(nroMesa);
+    setSubtotal(subtotal);
+    setPorcentajeDescuento(porcentajeDesc);
+    setPuntuacionServicio(puntuacion);
+}
+
+// Getters
+int Pedido::getIdPedido() { return _idPedido; }
+int Pedido::getIdCliente() { return _idCliente; }
+int Pedido::getIdEmpleado() { return _idEmpleado; }
+int Pedido::getNroMesa() { return _nroMesa; }
+Fecha Pedido::getFecha() { return _fecha; }
+float Pedido::getSubtotal() { return _subtotal; }
+int Pedido::getPorcentajeDescuento() { return _porcentajeDescuento; }
+
+float Pedido::getTotal() {
+    float factorDescuento = _porcentajeDescuento / 100.0f;
+    float montoDescuento = _subtotal * factorDescuento;
+    float totalCalculado = _subtotal - montoDescuento;
+    return (totalCalculado > 0.0f) ? totalCalculado : 0.0f;
+}
+
+int Pedido::getPuntuacionServicio() { return _puntuacionServicio; }
+bool Pedido::getEliminado() { return _eliminado; }
+
+// Setters
+void Pedido::setNroMesa(int nro) {
+    if (nro > 0) {
+        _nroMesa = nro;
+    } else {
+        cout << "Numero de mesa incorrecto. Debe ser mayor a 0. Se le asignara 1 por defecto." << endl;
+        _nroMesa = 1;
+    }
+}
+
+void Pedido::setFecha(Fecha fecha) {
+    _fecha = fecha;
+}
+
+void Pedido::setSubtotal(float subtotal) {
+    if (subtotal >= 0.0f) {
+        _subtotal = subtotal;
+    } else {
+        cout << "El subtotal debe ser un numero positivo o cero. Se asignara 0.0 por defecto." << endl;
+        _subtotal = 0.0f;
+    }
+}
+
+void Pedido::setPorcentajeDescuento(int porcentaje) {
+    if (porcentaje >= 0 && porcentaje <= 100) {
+        _porcentajeDescuento = porcentaje;
+    } else {
+        cout << "Porcentaje de descuento invalido (debe ser entre 0 y 100). Se asignara 0." << endl;
+        _porcentajeDescuento = 0;
+    }
+}
+
+void Pedido::setPuntuacionServicio(int puntuacion) {
+    if (puntuacion >= 1 && puntuacion <= 5) {
+        _puntuacionServicio = puntuacion;
+    } else {
+        cout << "La puntuacion debe ser un valor entre 1 y 5 inclusive. Se le asignara 3 por defecto." << endl;
+        _puntuacionServicio = 3;
+    }
+}
+
+void Pedido::setEliminado(bool eliminado) {
+    _eliminado = eliminado;
+}
+
+
+// Método Cargar
+void Pedido::Cargar(int idPedido, int idCliente, int idEmpleado) {
+    _idPedido = idPedido;
+    _idCliente = idCliente;
+    _idEmpleado = idEmpleado;
+
+    cout << "ID del Pedido asignado: " << _idPedido << endl;
+    cout << "ID del Cliente asignado: "<< _idCliente<<endl;
+    cout << "ID del Empleado asignado: "<<_idEmpleado<<endl;
+
+
+    cout << "Ingrese la fecha del pedido:" << endl;
+    _fecha.Cargar();
+
+    int mesa, puntaje, porcDesc;
+    float subt;
+
+    cout << "Ingrese el numero de mesa: ";
+    cin >> mesa;
+    setNroMesa(mesa);
+
+    cout << "Ingrese el subtotal (antes de descuentos): ";
+    cin >> subt;
+    setSubtotal(subt);
+
+    cout << "Ingrese el porcentaje de descuento (0 a 100, sin %): ";
+    cin >> porcDesc;
+    setPorcentajeDescuento(porcDesc);
+
+    cout << "Ingrese el puntaje del servicio (1-5): ";
+    cin >> puntaje;
+    setPuntuacionServicio(puntaje);
+
+    _eliminado = false;
+    cout << "Pedido cargado correctamente." << endl;
+}
+
+// Método Mostrar
+void Pedido::Mostrar() {
+    cout << "--- DATOS DEL PEDIDO ---" << endl;
+    cout << "ID del Pedido: " << _idPedido << endl;
+    cout << "ID del Cliente: " << _idCliente << endl;
+    cout << "ID del Empleado: " << _idEmpleado << endl;
+    cout << "Fecha: ";
+    _fecha.Mostrar();
+    cout << "Numero de mesa: " << _nroMesa << endl;
+    cout << "Subtotal: $" << _subtotal << endl;
+    cout << "Descuento Aplicado: " << _porcentajeDescuento << "%" << endl;
+    cout << "TOTAL A PAGAR: $" << getTotal() << endl;
+    cout << "Puntuacion del servicio: " << _puntuacionServicio << endl;
+    cout << "-------------------------" << endl;
+}

@@ -1,0 +1,124 @@
+#include <iostream>
+#include <cstring>
+#include <cstdio>  // Necesaria para fflush
+//#include "Producto.h"
+
+#include "../../Headers/Entities/Producto.h"
+
+using namespace std;
+
+
+Producto::Producto(int idProducto,
+                   const char* nombre,
+                   float precio,
+                   int stock,
+                   bool eliminado) {
+    setIdProducto(idProducto);
+    setNombre(nombre);
+    setPrecio(precio);
+    setStock(stock);
+    setEliminado(eliminado);
+}
+
+//Getters
+int Producto::getIdProducto() { return _idProducto; }
+const char* Producto::getNombre() { return _nombre; }
+float Producto::getPrecio() { return _precio; }
+int Producto::getStock() { return _stock; }
+bool Producto::getEliminado() { return _eliminado; }
+
+
+//Setters
+void Producto::setIdProducto(int idProducto) {
+    if (idProducto >= 0) {
+        _idProducto = idProducto;
+    } else {
+        cout << "ID incorrecto. Debe ser igual o mayor a 0. Se asignara 0 por defecto." << endl;
+        _idProducto = 0;
+    }
+}
+
+void Producto::setNombre(const char* nombre) {
+     if (nombre != nullptr && nombre[0] != '\0') {
+         if (strlen(nombre) < 50) {
+            strcpy(_nombre, nombre);
+         } else {
+            cout << "Nombre demasiado largo. Se cortará en 49 caracteres." << endl;
+            strncpy(_nombre, nombre, 49);
+            _nombre[49] = '\0';
+         }
+     } else {
+        cout << "Nombre invalido. Se asignara 'Sin Nombre'." << endl;
+        strcpy(_nombre, "Sin Nombre");
+     }
+}
+
+void Producto::setPrecio(float precio) {
+    if (precio >= 0.0f) {
+        _precio = precio;
+    } else {
+        cout << "Precio invalido. No puede ser negativo. Se asignara 0.0." << endl;
+        _precio = 0.0f;
+    }
+}
+
+void Producto::setStock(int stock) {
+    if (stock >= 0) {
+        _stock = stock;
+    } else {
+        cout << "Stock invalido. No puede ser negativo. Se asignara 0." << endl;
+        _stock = 0;
+    }
+}
+
+void Producto::setEliminado(bool eliminado) {
+    _eliminado = eliminado;
+}
+
+//Métodos Cargar() y Mostrar()
+
+void Producto::Cargar(int idProducto) {
+    int stk;
+    float pre;
+    char nom[50]; // Variable temporal para el nombre
+
+    setIdProducto(idProducto);
+    cout << "ID de Producto asignado: "<<idProducto<<endl;
+
+
+    cout << "Ingrese Nombre: ";
+    // Lógica de cargarCadena
+
+    fflush(stdin); // Limpia buffer antes de leer carácter por carácter
+    int i;
+    for (i = 0; i < 49; i++) { // Leemos hasta 49 para dejar espacio al '\0'
+        nom[i] = cin.get(); // Lee un carácter
+        if (nom[i] == '\n') { // Si es Enter, termina
+            break;
+        }
+    }
+    nom[i] = '\0'; // Agrega el terminador nulo
+    fflush(stdin); // Limpia buffer después
+    //  Fin lógica cargarCadena
+        setNombre(nom); //setter para asignar y validar longitud
+
+    cout << "Ingrese Precio: ";
+    cin >> pre;
+    setPrecio(pre);
+
+    cout << "Ingrese Stock: ";
+    cin >> stk;
+    setStock(stk);
+
+    _eliminado = false; // Un producto nuevo siempre inicia activo
+    cout << "Producto cargado correctamente." << endl;
+}
+
+void Producto::Mostrar() {
+    cout << "-----------------------------" << endl;
+    cout << "ID Producto: " << _idProducto << endl;
+    cout << "Nombre: " << _nombre << endl;
+    cout << "Precio: $" << _precio << endl;
+    cout << "Stock: " << _stock << endl;
+    cout << "-----------------------------" << endl;
+}

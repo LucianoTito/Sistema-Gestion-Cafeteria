@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="Sistema de Gestión" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Option virtualFolders="Sources/Persistence/;Headers/Persistence/;Sources/Entities/;Headers/Entities/" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/Sistema de Gestión" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+				<ResourceCompiler>
+					<Add directory="Headers" />
+				</ResourceCompiler>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/Sistema de Gestión" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add option="-fexceptions" />
+		</Compiler>
+		<Unit filename="Headers/Entities/Cliente.h" />
+		<Unit filename="Headers/Entities/DetallePedido.h" />
+		<Unit filename="Headers/Entities/Empleado.h" />
+		<Unit filename="Headers/Entities/Fecha.h" />
+		<Unit filename="Headers/Entities/Pagos.h" />
+		<Unit filename="Headers/Entities/Pedido.h" />
+		<Unit filename="Headers/Entities/Persona.h" />
+		<Unit filename="Headers/Entities/Producto.h" />
+		<Unit filename="Headers/Persistence/ArchivoCliente.h" />
+		<Unit filename="Headers/Persistence/ArchivoDetallePedido.h" />
+		<Unit filename="Headers/Persistence/ArchivoEmpleado.h" />
+		<Unit filename="Headers/Persistence/ArchivoPagos.h" />
+		<Unit filename="Headers/Persistence/ArchivoPedido.h" />
+		<Unit filename="Headers/Persistence/ArchivoProducto.h" />
+		<Unit filename="Headers/UI/configuraciones.h" />
+		<Unit filename="Headers/UI/menus.h" />
+		<Unit filename="Headers/UI/reportes.h" />
+		<Unit filename="Sources/Entities/Cliente.cpp" />
+		<Unit filename="Sources/Entities/DetallePedido.cpp" />
+		<Unit filename="Sources/Entities/Empleado.cpp" />
+		<Unit filename="Sources/Entities/Fecha.cpp" />
+		<Unit filename="Sources/Entities/Pagos.cpp" />
+		<Unit filename="Sources/Entities/Pedido.cpp" />
+		<Unit filename="Sources/Entities/Persona.cpp" />
+		<Unit filename="Sources/Entities/Producto.cpp" />
+		<Unit filename="Sources/Persistence/ArchivoCliente.cpp" />
+		<Unit filename="Sources/Persistence/ArchivoDetallePedido.cpp" />
+		<Unit filename="Sources/Persistence/ArchivoEmpleado.cpp" />
+		<Unit filename="Sources/Persistence/ArchivoPagos.cpp" />
+		<Unit filename="Sources/Persistence/ArchivoPedido.cpp" />
+		<Unit filename="Sources/Persistence/ArchivoProducto.cpp" />
+		<Unit filename="Sources/UI/configuraciones.cpp" />
+		<Unit filename="Sources/UI/menus.cpp" />
+		<Unit filename="Sources/UI/reportes.cpp" />
+		<Unit filename="Sources/main.cpp" />
+		<Extensions>
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
