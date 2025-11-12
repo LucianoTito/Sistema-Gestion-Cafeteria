@@ -391,6 +391,7 @@ void menuClientes(){
          cout << "2. LISTAR CLIENTES"<<endl;
          cout << "3. MODIFICAR CLIENTE"<<endl;
          cout << "4. ELIMINAR CLIENTE"<<endl;
+         cout << "5. DAR DE ALTA A UN CLIENTE"<<endl;
          cout << "------------------------------------------"<<endl;
          cout << "0. VOLVER AL MENU PRINCIPAL"<<endl;
          cout << "=========================================="<<endl;
@@ -411,6 +412,9 @@ void menuClientes(){
         break;
      case 4:
         bajaCliente();
+        break;
+     case 5:
+        altaCliente();
         break;
      case 0:
         return;
@@ -453,8 +457,9 @@ void listarClientes(){
 
 ArchivoCliente arcCliente("Clientes.dat");
 
-cout << "---------- LISTADO DE CLIENTES ----------"<<endl;
+
 arcCliente.listar();
+arcCliente.listarEliminados();
 
 }
 
@@ -462,8 +467,16 @@ void modificarCliente(){
 
 ArchivoCliente arcCliente("Clientes.dat");
 
+if(!arcCliente.hayClientesConEstadoEliminado(false)){
+    cout << "No hay clientes activos para modificar."<<endl;
+    return;
+}
+
 int idModificar;
-cout << "---------- MODIFICAR CLIENTE ----------"<<endl;
+cout << "------- MODIFICAR CLIENTE -------"<<endl;
+
+arcCliente.listar();
+
 cout << "Ingrese el ID del cliente que quiere modificar: ";
 cin>> idModificar;
 
@@ -477,6 +490,11 @@ if (posicionId == -1){
 
 //Si se ecnontró , leer el registro actual en esa posición
 Cliente reg = arcCliente.leerRegistro(posicionId);
+
+if(reg.getEliminado()==true){
+    cout << "El cliente seleccionado no se encuentra activo."<<endl;
+    return;
+}
 
 cout << "Cliente encontrado. Datos actuales:"<<endl;
 reg.Mostrar();
@@ -516,8 +534,16 @@ void bajaCliente(){
 
     ArchivoCliente arcCliente("Clientes.dat");
 
+    if(!arcCliente.hayClientesConEstadoEliminado(false)){
+
+        cout << "No hay clientes activos para eliminar."<<endl;
+        return;
+    }
+
     int idEliminar;
     cout << "---------- ELIMINAR CLIENTE ----------"<<endl;
+
+    arcCliente.listar();
     cout << "Ingrese el ID del cliente que desea eliminar: ";
     cin>> idEliminar;
 
@@ -561,6 +587,53 @@ if (confirmacion == 'S' || confirmacion == 's'){
 } else {
     cout << "OPERACION CANCELADA"<<endl;
 }
+
+}
+
+void altaCliente(){
+
+ArchivoCliente arcCliente("Clientes.dat");
+
+if (!arcCliente.hayClientesConEstadoEliminado(true)){
+
+    cout<< "No hay clientes dados de baja para dar de alta"<<endl;
+    return;
+}
+
+int idRecuperar;
+cout<< "------- DAR DE ALTA CLIENTE -------"<<endl;
+
+arcCliente.listarEliminados();
+cout<< "Ingrese el ID del cliente que desea activar nuevamente: ";
+cin>> idRecuperar;
+
+int posicionId = arcCliente.buscarRegistro(idRecuperar);
+
+if(posicionId == -1){
+
+    cout << "ERROR. No se encontro un cliente con el ID: "<<idRecuperar<<endl;
+    return;
+}
+
+Cliente reg = arcCliente.leerRegistro(posicionId);
+
+if(reg.getEliminado() == false){
+
+    cout<< "El cliente seleccionado ya se encuentra activo."<<endl;
+    return;
+}
+
+reg.setEliminado(false);
+
+bool grabadoExitosamente = arcCliente.modificarRegistro(reg, posicionId);
+
+if(grabadoExitosamente){
+
+    cout << "Cliente dado de alta exitosamente."<<endl;
+} else {
+        cout << "ERROR. No se pudo dar de alta al cliente."<<endl;
+}
+
 
 }
 

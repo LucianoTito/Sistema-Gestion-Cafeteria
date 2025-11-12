@@ -153,16 +153,22 @@ if (pArchivo == nullptr){
 }
 
 Cliente regLeido;
+bool hayClientes = false;
 
-cout<< endl<< "---------- LISTADO DE CLIENTES ----------"<<endl;
+cout<< endl<< "------- CLIENTES ACTIVOS -------"<<endl;
 
 while (fread (&regLeido, sizeof(Cliente), 1, pArchivo) == 1){
 
     if (regLeido.getEliminado()== false){
 
         regLeido.Mostrar();
+        hayClientes = true;
     }
 
+}
+if (!hayClientes){
+
+    cout << "No hay clientes activos para mostrar."<<endl;
 }
 
 cout <<"---------- FIN DEL LISTADO ----------" <<endl<<endl;
@@ -170,3 +176,67 @@ cout <<"---------- FIN DEL LISTADO ----------" <<endl<<endl;
 fclose(pArchivo);
 
 }
+
+void ArchivoCliente::listarEliminados(){
+
+FILE *pArchivo = fopen(_nombreArchivo.c_str(), "rb");
+
+if(pArchivo == nullptr){
+    cout << "Error al abrir el archivo para listar a Clientes."<<endl;
+    return;
+}
+
+Cliente regLeido;
+bool hayClientes = false;
+
+cout<< endl<< "------- CLIENTES DADOS DE BAJA -------"<<endl;
+
+while(fread(&regLeido, sizeof(Cliente), 1, pArchivo)==1){
+
+    if(regLeido.getEliminado()==true){
+        regLeido.Mostrar();
+        hayClientes=true;
+    }
+}
+
+if(!hayClientes){
+    cout << "No hay clientes dados de baja."<<endl;
+}
+
+cout << "------- FIN DEL LISTADO -------"<<endl<<endl;
+
+
+fclose(pArchivo);
+}
+
+bool ArchivoCliente::hayClientesConEstadoEliminado(bool eliminado){
+
+FILE *pArchivo = fopen(_nombreArchivo.c_str(), "rb");
+
+if(pArchivo == nullptr){
+    return false;
+}
+
+Cliente regLeido;
+
+while(fread(&regLeido, sizeof(Cliente), 1, pArchivo) == 1){
+
+    if (regLeido.getEliminado() == eliminado){
+        fclose(pArchivo);
+        return true;
+    }
+}
+fclose(pArchivo);
+
+return false;
+
+}
+
+
+
+
+
+
+
+
+

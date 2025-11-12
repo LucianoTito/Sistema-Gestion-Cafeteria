@@ -34,6 +34,8 @@ public:
 
     //Listar
     void listar();
+    void listarEliminados();
+    bool hayClientesConEstadoEliminado(bool eliminado);
 
 
 };

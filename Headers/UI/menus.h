@@ -21,6 +21,7 @@ void agregarCliente();
 void listarClientes();
 void modificarCliente();
 void bajaCliente();
+void altaCliente();
 
 //Declaraciones de acciones para Empleados
 void agregarEmpleado();
