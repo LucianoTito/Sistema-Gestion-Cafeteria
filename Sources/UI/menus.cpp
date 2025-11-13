@@ -160,7 +160,7 @@ Producto regProducto;
 //ID autoincremental
 int nuevoID = arcProducto.contarRegistros() + 1;
 
-cout << "---------- AGREGAR NUEVO PROUCTO ----------" <<endl;
+cout << "-------- AGREGAR NUEVO PRODUCTO --------" <<endl;
 
 //Cargar(nuevoID) pedirá nombre, precio,stock, etc
 regProducto.Cargar(nuevoID);
@@ -185,13 +185,25 @@ void listarProductos(){
 
 ArchivoProducto arcProducto ("Productos.dat");
 
-cout << "-------- LISTADO DE PRODUCTOS ACTIVOS --------"<<endl;
+bool hayActivos = arcProducto.hayProductosConEstadoEliminado(false);
+bool hayEliminados = arcProducto.hayProductosConEstadoEliminado(true);
+
+
+if(!hayActivos && !hayEliminados){
+
+    cout<< "No hay productos activos o inactivos registrados para listar."<<endl;
+    cout<< endl;
+    return;
+}
+
+cout << "----- LISTADO DE PRODUCTOS ACTIVOS -----"<<endl;
 
 arcProducto.listar();
+cout<<endl;
+cout << "=========================================="<<endl;
+cout<<endl;
 
-cout << "================================================="<<endl;
-
-cout << "------- LISTADO DE PRODUCTOS INACTIVOS -------"<<endl;
+cout << "----- LISTADO DE PRODUCTOS INACTIVOS -----"<<endl;
 
 arcProducto.listarEliminados();
 }
@@ -210,6 +222,7 @@ int idModificar;
 
 cout << "----- MODIFICAR PRODUCTO -----" <<endl;
 arcProducto.listar();
+cout<<endl;
 cout << "Ingrese el ID del producto que desaea modificar: ";
 cin >> idModificar;
 
@@ -457,6 +470,19 @@ void listarClientes(){
 
 ArchivoCliente arcCliente("Clientes.dat");
 
+cout << "======= LISTADO DE CLIENTES ======"<<endl;
+
+bool hayActivos = arcCliente.hayClientesConEstadoEliminado(false);
+bool hayEliminados = arcCliente.hayClientesConEstadoEliminado(true);
+
+
+if(!hayActivos && !hayEliminados){
+
+    cout<< "No hay Clientes activos o inactivos registrados para listar."<<endl;
+    cout<< endl;
+    return;
+}
+
 
 arcCliente.listar();
 arcCliente.listarEliminados();
@@ -651,6 +677,7 @@ void menuEmpleados(){
         cout << "2. LISTAR EMPLEADOS"<<endl;
         cout << "3. MODIFICAR EMPLEADO"<<endl;
         cout << "4. ELIMINAR EMPLEADO"<<endl;
+        cout << "5. DAR DE ALTA EMPLEADO"<<endl;
         cout << "------------------------------------------"<<endl;
         cout << "0. VOLVER AL MENU PRINCIPAL" <<endl;
         cout << "=========================================="<<endl;
@@ -671,6 +698,9 @@ void menuEmpleados(){
         break;
     case 4:
         bajaEmpleado();
+        break;
+    case 5:
+        altaEmpleado();
         break;
     case 0:
         return;
@@ -712,9 +742,21 @@ void listarEmpleados(){
 
     ArchivoEmpleado arcEmpleado("Empleados.dat");
 
-    cout << "---------- LISTADO DE EMPLEADOS ----------"<<endl;
+    cout << "===== LISTADO DE EMPLEADOS ====="<<endl;
+
+bool hayActivos = arcEmpleado.hayEmpleadosConEstadoEliminado(false);
+bool hayEliminados = arcEmpleado.hayEmpleadosConEstadoEliminado(true);
+
+
+if(!hayActivos && !hayEliminados){
+    cout<< endl;
+    cout<< "No hay productos activos o inactivos registrados para listar."<<endl;
+    cout<< endl;
+    return;
+}
 
     arcEmpleado.listar();
+    arcEmpleado.listarEliminados();
 
 }
 
@@ -722,8 +764,16 @@ void modificarEmpleado(){
 
 ArchivoEmpleado arcEmpleado("Empleados.dat");
 
+if(!arcEmpleado.hayEmpleadosConEstadoEliminado(false)){
+
+    cout << "No hay empleados activos para modificar."<<endl;
+    return;
+}
+
 int idModificar;
-cout << "---------- MODIFICAR EMPLEADO ----------"<<endl;
+cout << "------- MODIFICAR EMPLEADO -------"<<endl;
+arcEmpleado.listar();
+
 cout << "Ingrese el ID del empleado que desea modificar";
 cin >> idModificar;
 
@@ -735,6 +785,12 @@ if(posicionID == -1){
 }
 
 Empleado reg = arcEmpleado.leerRegistro(posicionID);
+
+if(reg.getEliminado()== true){
+
+    cout << "El empleado seleccionado no se encuentra activo. No se puede modificar."<<endl;
+    return;
+}
 
 cout << "Empleado encontrado. Datos actuales: "<<endl;
 reg.Mostrar();
@@ -776,9 +832,18 @@ void bajaEmpleado(){
 
 ArchivoEmpleado arcEmpleado("Empleados.dat");
 
+if(!arcEmpleado.hayEmpleadosConEstadoEliminado(false)){
+
+    cout<< "No hay empleados activos para eliminar."<<endl;
+    return;
+}
+
 int idEliminar;
 
-cout << "---------- ELIMINAR EMPLEADO ----------"<<endl;
+cout << "------- ELIMINAR EMPLEADO -------"<<endl;
+arcEmpleado.listar();
+
+cout<<endl;
 cout << "Ingrese el ID del empleado que quiere eliminar: ";
 cin >> idEliminar;
 
@@ -786,7 +851,8 @@ int posicionId= arcEmpleado.buscarRegistro(idEliminar);
 
 if (posicionId == -1){
 
-    cout << "ERROR. No se encontro un empelado con el id: "<<idEliminar<<endl;
+    cout<<endl;
+    cout << "ERROR. No se encontro un empelado con el ID: "<<idEliminar<<endl;
     return;
 }
 //Si se pudo econtrar
@@ -817,10 +883,65 @@ if (confirmacion == 'S'|| confirmacion == 's'){
         cout << "Empleado dado de baja correctamente."<<endl;
     }else {
         cout << "ERROR. No se pudo dar de baja al empleado con ID: "<< idEliminar<<endl;
+        cout<<endl;
     }
 }else {
     cout << "Operacion cancelada."<<endl;
 }
+
+
+}
+
+void altaEmpleado(){
+
+ArchivoEmpleado arcEmpleado("Empleados.dat");
+
+if (!arcEmpleado.hayEmpleadosConEstadoEliminado(true)){
+
+    cout<<endl;
+    cout<< "No hay empleados dados de baja para dar de alta."<<endl;
+    cout<<endl;
+    return;
+}
+
+int idRecuperar;
+cout << "---- DAR DE ALTA EMPLEADO ----"<<endl;
+arcEmpleado.listarEliminados();
+
+cout<<endl;
+cout << "Ingrese el ID del empleado que desea activar nuevamente";
+cin>> idRecuperar;
+
+int posicionId = arcEmpleado.buscarRegistro(idRecuperar);
+
+if(posicionId == -1){
+
+    cout << "ERROR. No se encontro un empleado con el ID: "<<idRecuperar<<endl;
+    cout<<endl;
+    return;
+}
+
+Empleado reg = arcEmpleado.leerRegistro(posicionId);
+
+if(reg.getEliminado()== false){
+
+    cout<< "El empleado seleccionado ya se encuentra activo"<<endl;
+    cout<<endl;
+    return;
+}
+
+reg.setEliminado(false);
+
+bool grabadoExitosamente = arcEmpleado.modificarRegistro(reg, posicionId);
+
+if (grabadoExitosamente){
+    cout << "Empleado dado de alta exitosamente."<<endl;
+
+}else {
+    cout << "ERROR. No se pudo dar de alta al empleado."<<endl;
+    cout<<endl;
+}
+
 
 
 }

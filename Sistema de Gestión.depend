@@ -132,36 +132,36 @@
 	<locale.h>
 	"../Headers/UI/menus.h"
 
-1762134811 source:d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\código - sistema de gestión\sistema de gestión\sources\persistence\archivoproducto.cpp
+1762965891 source:d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\código - sistema de gestión\sistema de gestión\sources\persistence\archivoproducto.cpp
 	<iostream>
 	<string>
 	<cstdio>
 	"../../Headers/Persistence/ArchivoProducto.h"
 	"../../Headers/Entities/Producto.h"
 
-1761711865 d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\código - sistema de gestión\sistema de gestión\headers\persistence\archivoproducto.h
+1762961053 d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\código - sistema de gestión\sistema de gestión\headers\persistence\archivoproducto.h
 	<string>
 	"../Entities/Producto.h"
 
-1761800144 source:d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\código - sistema de gestión\sistema de gestión\sources\persistence\archivocliente.cpp
+1762989232 source:d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\código - sistema de gestión\sistema de gestión\sources\persistence\archivocliente.cpp
 	<iostream>
 	<string>
 	<cstdio>
 	"../../Headers/Persistence/ArchivoCliente.h"
 	"../../Headers/Entities/Cliente.h"
 
-1761792047 d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\código - sistema de gestión\sistema de gestión\headers\persistence\archivocliente.h
+1762989531 d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\código - sistema de gestión\sistema de gestión\headers\persistence\archivocliente.h
 	<string>
 	"../Entities/Cliente.h"
 
-1761801031 source:d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\código - sistema de gestión\sistema de gestión\sources\persistence\archivoempleado.cpp
+1763007972 source:d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\código - sistema de gestión\sistema de gestión\sources\persistence\archivoempleado.cpp
 	<iostream>
 	<string>
 	<cstdio>
 	"../../Headers/Persistence/ArchivoEmpleado.h"
 	"../../Headers/Entities/Empleado.h"
 
-1761801210 d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\código - sistema de gestión\sistema de gestión\headers\persistence\archivoempleado.h
+1762991657 d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\código - sistema de gestión\sistema de gestión\headers\persistence\archivoempleado.h
 	<string>
 	"../Entities/Empleado.h"
 
@@ -198,7 +198,7 @@
 	<string>
 	"../Entities/Pagos.h"
 
-1762650507 source:d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\código - sistema de gestión\sistema de gestión\sources\ui\menus.cpp
+1763012265 source:d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\código - sistema de gestión\sistema de gestión\sources\ui\menus.cpp
 	<iostream>
 	<cstdio>
 	"../../Headers/UI/menus.h"
@@ -216,7 +216,7 @@
 	"../../Headers/Persistence/ArchivoPagos.h"
 	"../../Headers/UI/reportes.h"
 
-1762704449 d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\código - sistema de gestión\sistema de gestión\headers\ui\menus.h
+1762991699 d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\código - sistema de gestión\sistema de gestión\headers\ui\menus.h
 
 1762205013 source:d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\código - sistema de gestión\sistema de gestión\sources\funciones.cpp
 	<iostream>
@@ -241,4 +241,19 @@
 1762644458 source:d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\código - sistema de gestión\sistema de gestión\sources\testfecha.cpp
 	<iostream>
 	"../Headers/Entities/Fecha.h"
+
+1762964520 source:d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\código - sistema de gestión\sistema de gestión\sources\ui\configuraciones.cpp
+	<iostream>
+	<cstdio>
+	<cstring>
+	"../../Headers/UI/configuraciones.h"
+	"../../Headers/Entities/Cliente.h"
+	"../../Headers/Entities/Producto.h"
+	"../../Headers/Entities/Empleado.h"
+	"../../Headers/Entities/Pedido.h"
+	"../../Headers/Entities/DetallePedido.h"
+	"../../Headers/Entities/Pagos.h"
+	"../../Headers/Entities/Fecha.h"
+
+1762784315 d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\código - sistema de gestión\sistema de gestión\headers\ui\configuraciones.h
 

@@ -35,5 +35,7 @@ public:
 
     //Listar
     void listar();
+    void listarEliminados();
+    bool hayEmpleadosConEstadoEliminado(bool eliminado);
 
 };

@@ -153,19 +153,89 @@ if(pArchivo == nullptr){
     return;
 }
 Empleado regLeido;
+bool hayEmpleados = false;
 
-cout<<endl<< "----------LISTADO DE EMPLEADOS ----------"<<endl;
+cout<<endl<< "------- EMPLEADOS ACTIVOS -------"<<endl;
 
 while(fread(&regLeido, sizeof(Empleado),1, pArchivo)==1){
 
     if(regLeido.getEliminado()== false){
 
         regLeido.Mostrar();
+        hayEmpleados=true;
     }
 }
+
+if(!hayEmpleados){
+    cout << "No hay empleados activos para mostrar."<<endl;
+}
+
 
 cout<< "---------- FIN DEL LISTADO ----------"<<endl<<endl;
 
 fclose(pArchivo);
+
+}
+
+void ArchivoEmpleado::listarEliminados(){
+
+FILE *pArchivo = fopen(_nombreArchivo.c_str(), "rb");
+
+if(pArchivo==nullptr){
+
+    cout << "Error al abrir el archivo para listar Empleado."<<endl;
+
+    return;
+}
+
+Empleado regLeido;
+bool hayEmpleados = false;
+
+cout<<endl<< "---- EMPLEADOS DADOS DE BAJA ----"<<endl;
+
+while(fread(&regLeido, sizeof(Empleado), 1, pArchivo)==1){
+
+    if(regLeido.getEliminado()== true){
+
+        regLeido.Mostrar();
+        hayEmpleados = true;
+    }
+}
+
+if(!hayEmpleados){
+    cout << "No hay empleados dados de baja"<<endl;
+}
+
+cout << "---- FIN DEL LISTADO ----"<<endl<<endl;
+
+fclose(pArchivo);
+
+
+}
+
+//Verifico si existan empleados activos/inactivos
+bool ArchivoEmpleado::hayEmpleadosConEstadoEliminado(bool eliminado){
+
+FILE *pArchivo = fopen(_nombreArchivo.c_str(), "rb");
+
+if(pArchivo == nullptr){
+
+    return false;
+}
+
+Empleado regLeido;
+
+while(fread(&regLeido,sizeof(Empleado), 1, pArchivo) == 1){
+
+    if(regLeido.getEliminado() == eliminado){
+
+        fclose(pArchivo);
+        return true;
+    }
+}
+
+fclose(pArchivo);
+return false;
+
 
 }

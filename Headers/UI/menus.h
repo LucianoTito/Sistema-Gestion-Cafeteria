@@ -28,6 +28,7 @@ void agregarEmpleado();
 void listarEmpleados();
 void modificarEmpleado();
 void bajaEmpleado();
+void altaEmpleado();
 
 //Declaraciones de Acciones para Pedidos
 void realizarPedido();
