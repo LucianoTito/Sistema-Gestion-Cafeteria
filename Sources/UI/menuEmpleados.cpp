@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cstdlib>
+#include <cstring>
 
 #include "../../Headers/UI/menuEmpleados.h"
 #include "../../Headers/Entities/Empleado.h"
@@ -7,6 +8,9 @@
 #include "../../Headers/Utilidades/Validaciones.h"
 
 using namespace std;
+
+
+void ordenarEmpleadosPorApellido(Empleado registros[], int cantidad);
 
 void menuEmpleados(){
 
@@ -19,6 +23,7 @@ void menuEmpleados(){
         cout << "3. MODIFICAR EMPLEADO"<<endl;
         cout << "4. ELIMINAR EMPLEADO"<<endl;
         cout << "5. DAR DE ALTA EMPLEADO"<<endl;
+        cout << "6. LISTAR EMPLEADOS ORDENADOS POR APELLIDO"<<endl;
         cout << "------------------------------------------"<<endl;
         cout << "0. VOLVER AL MENU PRINCIPAL" <<endl;
         cout << "=========================================="<<endl;
@@ -43,6 +48,9 @@ void menuEmpleados(){
         break;
     case 5:
         altaEmpleado();
+        break;
+    case 6:
+        listarEmpleadosOrdenadosPorApellido();
         break;
     case 0:
         return;
@@ -99,6 +107,56 @@ if(!hayActivos && !hayEliminados){
 
     arcEmpleado.listar();
     arcEmpleado.listarEliminados();
+
+}
+
+void listarEmpleadosOrdenadosPorApellido(){
+
+ArchivoEmpleado arcEmpleado("Empleados.dat");
+
+int totalRegistros = arcEmpleado.contarRegistros();
+
+if(totalRegistros == 0){
+    cout << "No hay empleados registrados para ordenar."<<endl;
+    return;
+}
+
+Empleado *registros = new Empleado[totalRegistros];
+
+int cantidadLeida = arcEmpleado.leerRegistros(registros, totalRegistros);
+
+if(cantidadLeida == 0){
+    cout << "No fue posible leer los empleados almacenados."<<endl;
+    delete [] registros;
+    return;
+}
+
+int cantidadActivos = 0;
+
+for(int i = 0; i < cantidadLeida; i++){
+    if(registros[i].getEliminado() == false){
+        registros[cantidadActivos] = registros[i];
+        cantidadActivos++;
+    }
+}
+
+if(cantidadActivos == 0){
+    cout << "No hay empleados activos para mostrar."<<endl;
+    delete [] registros;
+    return;
+}
+
+ordenarEmpleadosPorApellido(registros, cantidadActivos);
+
+cout << "----- LISTADO ORDENADO POR APELLIDO -----"<<endl;
+
+for(int i = 0; i < cantidadActivos; i++){
+    registros[i].Mostrar();
+}
+
+cout << "--- FIN DEL LISTADO ---"<<endl;
+
+delete [] registros;
 
 }
 
@@ -269,6 +327,20 @@ if (grabadoExitosamente){
     cout<<endl;
 }
 
+}
 
+void ordenarEmpleadosPorApellido(Empleado registros[], int cantidad){
+
+for(int i = 0; i < cantidad - 1; i++){
+
+    for(int j = i + 1; j < cantidad; j++){
+
+        if(strcmp(registros[i].getApellido(), registros[j].getApellido()) > 0){
+            Empleado aux = registros[i];
+            registros[i] = registros[j];
+            registros[j] = aux;
+        }
+    }
+}
 
 }

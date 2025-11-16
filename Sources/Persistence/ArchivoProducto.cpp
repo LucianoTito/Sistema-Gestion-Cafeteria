@@ -248,5 +248,28 @@ fclose(pArchivo);
 
 return false;
 
-
 }
+
+
+int ArchivoProducto::leerRegistros(Producto registros[], int cantidadMaxima){
+
+FILE *pArchivo = fopen(_nombreArchivo.c_str(), "rb");
+
+if(pArchivo == nullptr){
+
+    return 0;
+}
+
+int cantidadLeida = 0;
+
+while(cantidadLeida < cantidadMaxima &&
+      fread(&registros[cantidadLeida], sizeof(Producto), 1, pArchivo) == 1){
+
+    cantidadLeida++;
+}
+
+fclose(pArchivo);
+
+return cantidadLeida;
+}
+

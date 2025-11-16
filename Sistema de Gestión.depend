@@ -360,7 +360,7 @@
 
 1762991699 d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\sistema_de_gestion\sistema de gestión\headers\ui\menus.h
 
-1762961053 d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\sistema_de_gestion\sistema de gestión\headers\persistence\archivoproducto.h
+1763272782 d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\sistema_de_gestion\sistema de gestión\headers\persistence\archivoproducto.h
 	<string>
 	"../Entities/Producto.h"
 
@@ -368,7 +368,7 @@
 	<string>
 	"../Entities/Cliente.h"
 
-1762991657 d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\sistema_de_gestion\sistema de gestión\headers\persistence\archivoempleado.h
+1763274888 d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\sistema_de_gestion\sistema de gestión\headers\persistence\archivoempleado.h
 	<string>
 	"../Entities/Empleado.h"
 
@@ -395,7 +395,7 @@
 	<string>
 	"../Entities/DetallePedido.h"
 
-1763007972 source:d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\sistema_de_gestion\sistema de gestión\sources\persistence\archivoempleado.cpp
+1763274965 source:d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\sistema_de_gestion\sistema de gestión\sources\persistence\archivoempleado.cpp
 	<iostream>
 	<string>
 	<cstdio>
@@ -420,7 +420,7 @@
 	"../../Headers/Persistence/ArchivoPedido.h"
 	"../../Headers/Entities/Pedido.h"
 
-1762965891 source:d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\sistema_de_gestion\sistema de gestión\sources\persistence\archivoproducto.cpp
+1763272934 source:d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\sistema_de_gestion\sistema de gestión\sources\persistence\archivoproducto.cpp
 	<iostream>
 	<string>
 	<cstdio>
@@ -485,7 +485,7 @@
 	"../../Headers/UI/configuraciones.h"
 	"../../Headers/Utilidades/Validaciones.h"
 
-1763271305 source:d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\sistema_de_gestion\sistema de gestión\sources\ui\menugestionclientes.cpp
+1763271392 source:d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\sistema_de_gestion\sistema de gestión\sources\ui\menugestionclientes.cpp
 	<iostream>
 	<cstdlib>
 	"../../Headers/UI/menuGestionClientes.h"
@@ -495,15 +495,16 @@
 
 1763266927 d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\sistema_de_gestion\sistema de gestión\headers\ui\menugestionclientes.h
 
-1763271060 source:d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\sistema_de_gestion\sistema de gestión\sources\ui\menugestionproductos.cpp
+1763274098 source:d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\sistema_de_gestion\sistema de gestión\sources\ui\menugestionproductos.cpp
 	<iostream>
 	<cstdlib>
+	<cstring>
 	"../../Headers/UI/menuGestionProductos.h"
 	"../../Headers/Entities/Producto.h"
 	"../../Headers/Persistence/ArchivoProducto.h"
 	"../../Headers/Utilidades/Validaciones.h"
 
-1763266991 d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\sistema_de_gestion\sistema de gestión\headers\ui\menugestionproductos.h
+1763272831 d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\sistema_de_gestion\sistema de gestión\headers\ui\menugestionproductos.h
 
 1763266107 source:d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\sistema_de_gestion\sistema de gestión\sources\ui\menupedidos.cpp
 	<iostream>
@@ -540,7 +541,7 @@
 
 1763266793 d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\sistema_de_gestion\sistema de gestión\headers\ui\menuprincipal.h
 
-1763267381 d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\sistema_de_gestion\sistema de gestión\headers\ui\menuempleados.h
+1763275334 d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\sistema_de_gestion\sistema de gestión\headers\ui\menuempleados.h
 
 1763271000 source:d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\sistema_de_gestion\sistema de gestión\sources\ui\menuempleados.cpp
 	<iostream>

@@ -37,5 +37,6 @@ public:
     void listar();
     void listarEliminados();
     bool hayEmpleadosConEstadoEliminado(bool eliminado);
+    int leerRegistros(Empleado registros[], int cantidadMaxima);
 
 };

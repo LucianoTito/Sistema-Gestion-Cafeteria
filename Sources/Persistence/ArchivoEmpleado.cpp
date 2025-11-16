@@ -237,5 +237,26 @@ while(fread(&regLeido,sizeof(Empleado), 1, pArchivo) == 1){
 fclose(pArchivo);
 return false;
 
+}
+
+int ArchivoEmpleado::leerRegistros(Empleado registros[], int cantidadMaxima){
+
+FILE *pArchivo = fopen(_nombreArchivo.c_str(), "rb");
+
+if(pArchivo == nullptr){
+    return 0;
+}
+
+int cantidadLeida = 0;
+
+while(cantidadLeida < cantidadMaxima &&
+      fread(&registros[cantidadLeida], sizeof(Empleado), 1, pArchivo) == 1){
+
+    cantidadLeida++;
+}
+
+fclose(pArchivo);
+
+return cantidadLeida;
 
 }

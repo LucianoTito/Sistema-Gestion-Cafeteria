@@ -6,3 +6,7 @@ void listarProductos();
 void modificarProducto();
 void bajaProducto();
 void altaProducto();
+void listarProductosOrdenadosPorNombre();
+void listarProductosOrdenadosPorPrecio();
+void consultarProductoPorID();
+void consultarProductosConStockBajo();

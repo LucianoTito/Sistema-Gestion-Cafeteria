@@ -53,6 +53,7 @@
 		<Unit filename="Headers/UI/configuraciones.h" />
 		<Unit filename="Headers/UI/menuEmpleados.h" />
 		<Unit filename="Headers/UI/menuGestionClientes.h" />
+		<Unit filename="Headers/UI/menuGestionProductos.h" />
 		<Unit filename="Headers/UI/menuPedidos.h" />
 		<Unit filename="Headers/UI/menuPrincipal.h" />
 		<Unit filename="Headers/UI/reportes.h" />
