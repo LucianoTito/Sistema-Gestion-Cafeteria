@@ -9,6 +9,7 @@
 #include "../../Headers/Entities/Producto.h"
 #include "../../Headers/Persistence/ArchivoProducto.h"
 #include "../../Headers/Entities/Pedido.h"
+#include "../../Headers/Entities/Fecha.h"
 #include "../../Headers/Persistence/ArchivoPedido.h"
 #include "../../Headers/Entities/DetallePedido.h"
 #include "../../Headers/Persistence/ArchivoDetallePedido.h"
@@ -16,6 +17,14 @@
 #include "../../Headers/Persistence/ArchivoPagos.h"
 #include "../../Headers/Utilidades/Validaciones.h"
 using namespace std;
+
+//Funciones auxiliares privadas de este módulo
+void ordenarPedidosPorFecha(Pedido vectorPedidos[], int cantidad);
+void mostrarResumenPedido(Pedido pedido);
+void menuConsultasPedidos();
+void consultaPedidosPorRangoFechas();
+void consultaPedidosPorCliente();
+void consultaPedidosPorEmpleado();
 
 void menuPedidos(){
 
@@ -27,8 +36,9 @@ while (true){
     cout << "========================================" <<endl;
     cout << "1. REALIZAR UN PEDIDO "<< endl;
     cout << "2. VER DETALLE DE UN PEDIDO" <<endl;
-    cout << "3. LISTAR TODOS LOS PEDIDOS" <<endl;
-    cout << "4. ANULAR UN PEDIDO "<<endl; //baja logica
+    cout << "3. LISTAR PEDIDOS (ORDENADOS POR FECHA)" <<endl;
+    cout << "4. CONSULTAS DE PEDIDOS" <<endl;
+    cout << "5. ANULAR UN PEDIDO "<<endl; //baja logica
     cout << "----------------------------------------" <<endl;
     cout << "0. VOLVER AL MENU PRINCIPAL" <<endl;
     cout << "========================================"<< endl;
@@ -50,6 +60,9 @@ case 3:
      listarPedidos();
     break;
 case 4:
+     menuConsultasPedidos();
+    break;
+case 5:
     anularPedido();
     break;
 case 0:
@@ -478,30 +491,314 @@ void listarPedidos() {
 
 ArchivoPedido arcPedido ("Pedidos.dat");
 
-cout << "---------- LISTADO DE PEDIDOS (GENERAL) ----------"<<endl;
+cout << "---------- LISTADO DE PEDIDOS ORDENADOS POR FECHA ----------"<<endl;
 
-bool hayActivos = arcPedido.hayPedidosConEstado(false);
-bool hayAnulados = arcPedido.hayPedidosConEstado(true);
+int cantidadRegistros = arcPedido.contarRegistros();
 
-if(!hayActivos && !hayAnulados){
+if(cantidadRegistros == 0){
     cout << "No hay pedidos cargados en el sistema."<<endl;
     return;
 }
+//Reservo memoria para copiar los pedidos y luego ordenarlos sin modificar el archivo
+Pedido *vectorPedidos = new Pedido[cantidadRegistros];
 
-if(hayActivos){
-    arcPedido.listarPorEstado(false);
-}else {
+int cantidadValidos = 0;
 
-    cout<<"No hay pedidos activos para mostrar" <<endl;
+//Recorro el archivo copiando los pedidos existentes
+for(int i=0; i<cantidadRegistros; i++){
+    Pedido reg = arcPedido.leerRegistro(i);
+    if(reg.getIdPedido() != -1){
+        vectorPedidos[cantidadValidos] = reg;
+        cantidadValidos++;
+    }
 }
-//Seccion de pedidos anulados
-if(hayAnulados){
-    arcPedido.listarPorEstado(true);
+
+if(cantidadValidos == 0){
+    cout << "No se encontraron pedidos válidos para mostrar."<<endl;
+    delete[] vectorPedidos;
+    return;
+}
+
+//Ordeno el vector por fecha utilizando burbujeo
+ordenarPedidosPorFecha(vectorPedidos, cantidadValidos);
+
+bool hayActivos = false;
+bool hayAnulados = false;
+
+cout << endl << "------- PEDIDOS ACTIVOS -------" << endl;
+for(int i=0; i<cantidadValidos; i++){
+    if(vectorPedidos[i].getEliminado() == false){
+        mostrarResumenPedido(vectorPedidos[i]);
+        hayActivos = true;
+    }
+}
+
+if(!hayActivos){
+    cout << "No hay pedidos activos para mostrar."<<endl;
+}
+
+cout << endl << "------- PEDIDOS ANULADOS -------" << endl;
+for(int i=0; i<cantidadValidos; i++){
+    if(vectorPedidos[i].getEliminado() == true){
+        mostrarResumenPedido(vectorPedidos[i]);
+        hayAnulados = true;
+    }
+}
+
+if(!hayAnulados){
+    cout << "No hay pedidos anulados para mostrar."<<endl;
+}
+
+cout << endl << "------- FIN DEL LISTADO -------" << endl;
+
+delete[] vectorPedidos;
+
+}
+
+void menuConsultasPedidos(){
+
+int opcion;
+
+while(true){
+    system("cls");
+    cout << "---------- CONSULTAS DE PEDIDOS ----------"<<endl;
+    cout << "========================================="<<endl;
+    cout << "1. CONSULTAR POR RANGO DE FECHAS"<<endl;
+    cout << "2. CONSULTAR POR CLIENTE"<<endl;
+    cout << "3. CONSULTAR POR EMPLEADO"<<endl;
+    cout << "-----------------------------------------"<<endl;
+    cout << "0. VOLVER"<<endl;
+    cout << "========================================="<<endl;
+
+    opcion = ingresarEntero("SELECCIONE UNA OPCION: ");
+    system("cls");
+
+    switch(opcion){
+    case 1:
+        consultaPedidosPorRangoFechas();
+        break;
+    case 2:
+        consultaPedidosPorCliente();
+        break;
+    case 3:
+        consultaPedidosPorEmpleado();
+        break;
+    case 0:
+        return;
+    default:
+        cout << "Opcion incorrecta. Vuelva a intentarlo."<<endl;
+        break;
+    }
+
+    system("pause");
+}
+
+}
+
+void consultaPedidosPorRangoFechas(){
+
+ArchivoPedido arcPedido("Pedidos.dat");
+
+cout << "---------- CONSULTA DE PEDIDOS POR RANGO DE FECHAS ----------"<<endl;
+
+if(!arcPedido.hayPedidosConEstado(false)){
+    cout << "No hay pedidos activos cargados en el sistema."<<endl;
+    return;
+}
+
+//Solicito las fechas al usuario
+Fecha fechaDesde, fechaHasta;
+
+cout << "Ingrese la FECHA DESDE:"<<endl;
+fechaDesde.Cargar();
+
+cout << endl << "Ingrese la FECHA HASTA:"<<endl;
+fechaHasta.Cargar();
+
+//Valido que la fecha hasta no sea anterior a la fecha desde
+if(fechaHasta < fechaDesde){
+    cout << "ERROR: La fecha final no puede ser anterior a la fecha inicial."<<endl;
+    return;
+}
+
+int cantidadRegistros = arcPedido.contarRegistros();
+int coincidencias = 0;
+
+cout << endl;
+cout << "Pedidos encontrados entre ";
+cout << fechaDesde.getDia() << "/" << fechaDesde.getMes() << "/" << fechaDesde.getAnio();
+cout << " y " << fechaHasta.getDia() << "/" << fechaHasta.getMes() << "/" << fechaHasta.getAnio() << endl;
+cout << "-------------------------------------------------------------"<<endl;
+
+// Recorro todos los pedidos para verificar cuáles se encuentran en el rango solicitado
+for(int i=0; i<cantidadRegistros; i++){
+    Pedido reg = arcPedido.leerRegistro(i);
+
+    if(reg.getEliminado()==false &&
+       reg.getFecha() >= fechaDesde &&
+       reg.getFecha() <= fechaHasta){
+
+        mostrarResumenPedido(reg);
+        coincidencias++;
+    }
+}
+
+if(coincidencias == 0){
+    cout << "No se encontraron pedidos en el periodo indicado."<<endl;
 }else{
-cout<< "No hay pedidos anulados."<<endl;
+    cout << "-------------------------------------------------------------"<<endl;
+    cout << "Total de pedidos encontrados: "<< coincidencias << endl;
 }
 
 }
+
+void consultaPedidosPorCliente(){
+
+ArchivoCliente arcCliente("Clientes.dat");
+ArchivoPedido arcPedido("Pedidos.dat");
+
+cout << "---------- CONSULTA DE PEDIDOS POR CLIENTE ----------"<<endl;
+
+if(!arcCliente.hayClientesConEstadoEliminado(false)){
+    cout << "No hay clientes activos en el sistema."<<endl;
+    return;
+}
+
+cout << endl << "CLIENTES ACTIVOS:"<<endl;
+arcCliente.listar();
+
+int idCliente = ingresarEntero("Ingrese el ID del cliente a consultar: ");
+
+int posicionCliente = arcCliente.buscarRegistro(idCliente);
+
+if(posicionCliente == -1){
+    cout << "ERROR: El ID del cliente no existe."<<endl;
+    return;
+}
+
+Cliente regCliente = arcCliente.leerRegistro(posicionCliente);
+
+if(regCliente.getEliminado()){
+    cout << "ERROR: El cliente seleccionado está eliminado."<<endl;
+    return;
+}
+
+int cantidadRegistros = arcPedido.contarRegistros();
+int coincidencias = 0;
+
+cout << endl << "Pedidos asociados al cliente ID "<< idCliente << ":"<<endl;
+cout << "-------------------------------------------------------------"<<endl;
+
+// Filtro todos los pedidos del archivo por el ID del cliente seleccionado
+for(int i=0; i<cantidadRegistros; i++){
+    Pedido reg = arcPedido.leerRegistro(i);
+
+    if(reg.getEliminado()==false && reg.getIdCliente() == idCliente){
+        mostrarResumenPedido(reg);
+        coincidencias++;
+    }
+}
+
+if(coincidencias == 0){
+    cout << "No se encontraron pedidos activos para este cliente."<<endl;
+}else{
+    cout << "-------------------------------------------------------------"<<endl;
+    cout << "Total de pedidos del cliente: "<< coincidencias << endl;
+}
+
+}
+
+void consultaPedidosPorEmpleado(){
+
+ArchivoEmpleado arcEmpleado("Empleados.dat");
+ArchivoPedido arcPedido("Pedidos.dat");
+
+cout << "---------- CONSULTA DE PEDIDOS POR EMPLEADO ----------"<<endl;
+
+if(!arcEmpleado.hayEmpleadosConEstadoEliminado(false)){
+    cout << "No hay empleados activos para realizar la consulta."<<endl;
+    return;
+}
+
+cout << endl << "EMPLEADOS ACTIVOS:"<<endl;
+arcEmpleado.listar();
+
+int idEmpleado = ingresarEntero("Ingrese el ID del empleado a consultar: ");
+
+int posicionEmpleado = arcEmpleado.buscarRegistro(idEmpleado);
+
+if(posicionEmpleado == -1){
+    cout << "ERROR: El ID del empleado no existe."<<endl;
+    return;
+}
+
+Empleado regEmpleado = arcEmpleado.leerRegistro(posicionEmpleado);
+
+if(regEmpleado.getEliminado()){
+    cout << "ERROR: El empleado seleccionado está eliminado."<<endl;
+    return;
+}
+
+int cantidadRegistros = arcPedido.contarRegistros();
+int coincidencias = 0;
+
+cout << endl << "Pedidos atendidos por el empleado ID "<< idEmpleado << ":"<<endl;
+cout << "-------------------------------------------------------------"<<endl;
+
+for(int i=0; i<cantidadRegistros; i++){
+    Pedido reg = arcPedido.leerRegistro(i);
+
+    if(reg.getEliminado()==false && reg.getIdEmpleado() == idEmpleado){
+        mostrarResumenPedido(reg);
+        coincidencias++;
+    }
+}
+
+if(coincidencias == 0){
+    cout << "No se encontraron pedidos activos para este empleado."<<endl;
+}else{
+
+    cout << "-------------------------------------------------------------"<<endl;
+    cout << "Total de pedidos atendidos: "<< coincidencias << endl;
+}
+}
+
+
+//Ordeno el vector recibido por parámetro utilizando el campo Fecha. Aplico burbujeo
+void ordenarPedidosPorFecha(Pedido vectorPedidos[], int cantidad){
+
+    for(int i=0; i<cantidad-1; i++){
+        for(int j=i+1; j<cantidad; j++){
+            // Si la fecha del pedido j es anterior a la del pedido i, se intercambian posiciones
+            if(vectorPedidos[j].getFecha() < vectorPedidos[i].getFecha()){
+                Pedido aux = vectorPedidos[i];
+                vectorPedidos[i] = vectorPedidos[j];
+                vectorPedidos[j] = aux;
+            }
+        }
+    }
+}
+
+//Muestra un resumen en una sola línea para facilitar la lectura de los listados
+void mostrarResumenPedido(Pedido pedido){
+
+    Fecha fecha = pedido.getFecha();
+
+    cout << "ID: " << pedido.getIdPedido()
+         << " | Fecha: " << fecha.getDia() << "/" << fecha.getMes() << "/" << fecha.getAnio()
+         << " | Cliente: " << pedido.getIdCliente()
+         << " | Empleado: " << pedido.getIdEmpleado()
+         << " | Mesa: " << pedido.getNroMesa()
+         << " | Total: $" << pedido.getTotal()
+         << endl;
+}
+
+
+
+
+
+
+
 
 
 void verDetallePedido(){
@@ -682,9 +979,8 @@ void anularPedido () {
                 cout << "ERROR: No se pudo anular el pedido"<<endl;
         }
 
-
     } else {
                 cout << "Operacion cancelada."<<endl;
     }
-
 }
+
