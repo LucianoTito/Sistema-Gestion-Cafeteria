@@ -443,7 +443,7 @@
 
 1762784315 d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\sistema_de_gestion\sistema de gestión\headers\ui\configuraciones.h
 
-1763162127 source:d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\sistema_de_gestion\sistema de gestión\sources\ui\reportes.cpp
+1763365603 source:d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\sistema_de_gestion\sistema de gestión\sources\ui\reportes.cpp
 	<iostream>
 	<cstdio>
 	"../../Headers/UI/reportes.h"
@@ -459,7 +459,7 @@
 	"../../Headers/Persistence/ArchivoProducto.h"
 	"../../Headers/Utilidades/Validaciones.h"
 
-1762554920 d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\sistema_de_gestion\sistema de gestión\headers\ui\reportes.h
+1763362897 d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\sistema_de_gestion\sistema de gestión\headers\ui\reportes.h
 
 1763333963 source:d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\sistema_de_gestion\sistema de gestión\sources\utilidades\validaciones.cpp
 	<iostream>
@@ -554,4 +554,12 @@
 	"../../Headers/Entities/Empleado.h"
 	"../../Headers/Persistence/ArchivoEmpleado.h"
 	"../../Headers/Utilidades/Validaciones.h"
+
+1763364213 source:d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\sistema_de_gestion\sistema de gestión\sources\utilidades\tablas.cpp
+	<iostream>
+	"../../Headers/Utilidades/Tablas.h"
+
+1763363276 d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\sistema_de_gestion\sistema de gestión\headers\utilidades\tablas.h
+	<iostream>
+	<iomanip>
 
