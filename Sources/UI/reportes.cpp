@@ -17,6 +17,7 @@
 #include "../../Headers/Persistence/ArchivoProducto.h"
 
 #include "../../Headers/Utilidades/Validaciones.h"
+#include "../../Headers/Utilidades/Tablas.h"
 
 
 using namespace std;
@@ -32,7 +33,7 @@ while(true){
 
     cout << "1. Recaudacion Anual/Mensual"<<endl;
     cout << "2. Productos Mas Vendidos"<<endl;
-    cout << "3. Ranking de clientes por Puntos"<<endl;
+    cout << "3. Ranking de clientes por Puntos de Fidelidad"<<endl;
     cout << "4. Informe de Desempeno de Empleados"<<endl;
     cout << "5. Productos vendidos por periodo"<<endl;
     cout << "------------------------------------"<<endl;
@@ -108,19 +109,23 @@ for (int i=0; i< cantPedidos; i++){
     }
 }
 
-cout<<endl<< "RECAUDACION DEL ANIO " << endl;
-cout << "============================="<<endl;
-cout << "MES\t\tRECAUDACION"<<endl;
-cout << "-----------------------------"<<endl;
+cout<<endl<< "RECAUDACION DEL ANIO " << anioBuscado << endl;
+
+lineaDoble(44);
+imprimirFila2("MES", "RECAUDACION");
+lineaSimple(44);
 
 const char* nombreMeses[12] = {"Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"};
 
+char totalMes[32];
 for (int i = 0; i<12; i++){
 
-    cout <<nombreMeses[i]<< ": \t$" <<vectorRecaudacionPorMes[i]<<endl;
-}
+snprintf(totalMes, sizeof(totalMes), "$ %.2f", vectorRecaudacionPorMes[i]);
+imprimirFila2(nombreMeses[i], totalMes);
 
-cout << "============================="<<endl;
+}
+lineaDoble(44);
+
 }
 
 //Función auxiliar p/ encontrar la posición del Mayor valor
@@ -192,8 +197,9 @@ for (int i = 0; i<cantidadDetalles; i++){
 }
 
 cout << "--- REPORTE DE PRODUCTOS MAS VENDIDOS  ---" << endl;
-cout << "=================================================" << endl;
-
+lineaDoble(74);
+imprimirFila4("POS", "ID", "PRODUCTO", "CANT.");
+lineaSimple(74);
 
     for (int i = 0; i < cantidadProductos; i++) {
 
@@ -209,14 +215,21 @@ cout << "=================================================" << endl;
         Producto regProductoMax = arcProducto.leerRegistro(posicionMaximo);
 
         //Muestro el resultado
-        cout << i + 1 << ". " << regProductoMax.getNombre();
-        cout << " - " << vectorCantidadVendida[posicionMaximo] << " unidades." << endl;
+        char pos[6];
+        char id[10];
+        char cantidad[12];
+        snprintf(pos, sizeof(pos), "%d", i + 1);
+        snprintf(id, sizeof(id), "%d", regProductoMax.getIdProducto());
+        snprintf(cantidad, sizeof(cantidad), "%d", vectorCantidadVendida[posicionMaximo]);
+
+        imprimirFila4(pos, id, regProductoMax.getNombre(), cantidad);
+
 
         //Elimino a este ganador del vector acumulador poniendo su contador en -1 para que no vuelva a se el máximo en la siguiente vuelta del bucle
         vectorCantidadVendida[posicionMaximo] = -1;
     }
 
-    cout << "=================================================" << endl;
+    lineaDoble(74);
 
 
 
@@ -227,7 +240,7 @@ cout << "=================================================" << endl;
 void reporteRankingClientes(){
 
 system ("cls");
-cout << "---------- RANKING DE CLIENTES POR PUNTOS DE FIDELIDAD ----------"<<endl;
+cout << "----------------- RANKING DE CLIENTES POR PUNTOS DE FIDELIDAD -------------------"<<endl;
 
 ArchivoCliente arcCliente("Clientes.dat");
 int cantidadClientes = arcCliente.contarRegistros();
@@ -283,19 +296,32 @@ for (int i=0; i<cantidadValidados - 1; i++){
     }
 }
 
-    cout << "POS\tID\tAPELLIDO\t\tNOMBRE\t\tPUNTOS" << endl;
-    cout << "-------------------------------------------------------------" << endl;
+lineaDoble(81);
+imprimirFila5("POS", "ID", "APELLIDO", "NOMBRE", "PUNTOS");
+lineaSimple(81);
+
+char pos[6];
+char id[8];
+char puntos[12];
+
 
     for (int i = 0; i<cantidadValidados; i++){
 
-        cout << i + 1 << "\t"
-        << vectorClientes[i].getId()<< "\t"
-        << vectorClientes[i].getApellido()<< "\t\t"
-        << vectorClientes[i].getNombre() << "\t\t"
-        << vectorClientes[i].getPuntosFidelidad()<<endl;
+        snprintf(pos, sizeof(pos), "%d", i + 1);
+        snprintf(id, sizeof(id), "%d", vectorClientes[i].getId());
+        snprintf(puntos, sizeof(puntos), "%d", vectorClientes[i].getPuntosFidelidad());
+
+        imprimirFila5(pos,
+                      id,
+                      vectorClientes[i].getApellido(),
+                      vectorClientes[i].getNombre(),
+                      puntos);
+
+
     }
 
-     cout << "-------------------------------------------------------------" << endl;
+    lineaDoble(81);
+
      cout << "Total de clientes activos: "<< cantidadValidados <<endl <<endl;
 
      delete []vectorClientes;
@@ -310,7 +336,7 @@ void reporteDesempenoEmpleados() {
 
     system("cls");
 
-    cout << "---------- REPORTE DE DESEMPENO DE EMPLEADOS ----------" << endl;
+    cout << "---------------------- REPORTE DE DESEMPENO DE EMPLEADOS ------------------------"<<endl;
 
     ArchivoEmpleado arcEmpleado("Empleados.dat");
     ArchivoPedido arcPedido("Pedidos.dat");
@@ -399,18 +425,29 @@ void reporteDesempenoEmpleados() {
 
     //Muestro el reporte
     cout << endl;
-    cout << "POS\tID\tAPELLIDO\t\tNOMBRE\t\tPEDIDOS ATENDIDOS" << endl;
-    cout << "---------------------------------------------------------------" << endl;
+    lineaDoble(81);
+    imprimirFila5("POS", "ID", "APELLIDO", "NOMBRE", "PEDIDOS");
+    lineaSimple(81);
+
+    char pos[6];
+    char id[8];
+    char pedidos[12];
+
 
     for (int i = 0; i < cantidadValidos; i++) {
-        cout << i + 1 << "\t"
-             << vectorEmpleados[i].getId() << "\t"
-             << vectorEmpleados[i].getApellido() << "\t\t"
-             << vectorEmpleados[i].getNombre() << "\t\t"
-             << vectorCantidadPedidos[i] << endl;
+
+        snprintf(pos, sizeof(pos), "%d", i + 1);
+        snprintf(id, sizeof(id), "%d", vectorEmpleados[i].getId());
+        snprintf(pedidos, sizeof(pedidos), "%d", vectorCantidadPedidos[i]);
+
+        imprimirFila5(pos,
+                      id,
+                      vectorEmpleados[i].getApellido(),
+                      vectorEmpleados[i].getNombre(),
+                      pedidos);
     }
 
-    cout << "---------------------------------------------------------------" << endl;
+    lineaDoble(81);
     cout << "Total de empleados activos: " << cantidadValidos << endl << endl;
 
     //Libero la memoria
@@ -552,23 +589,29 @@ void reporteProductosPorPeriodo(){
          << " - "
          << fechaHasta.getDia() << "/" << fechaHasta.getMes() << "/" << fechaHasta.getAnio() << endl;
 
-    cout << "===============================================================" << endl;
-    cout << "POS\tID\tPRODUCTO\t\tCANTIDAD VENDIDA" << endl;
-    cout << "---------------------------------------------------------------" << endl;
+    lineaDoble(74);
+    imprimirFila4("POS", "ID", "PRODUCTO", "CANT.");
+    lineaSimple(74);
+
 
     int totalGeneral = 0;
     for (int i = 0; i < cantidadValidos; i++) {
         if (vectorCantidadVendida[i] > 0) {
-            cout << i + 1 << "\t"
-                 << vectorProductos[i].getIdProducto() << "\t"
-                 << vectorProductos[i].getNombre() << "\t\t"
-                 << vectorCantidadVendida[i] << endl;
+
+            char pos[6];
+            char id[10];
+            char cantidad[12];
+            snprintf(pos, sizeof(pos), "%d", i + 1);
+            snprintf(id, sizeof(id), "%d", vectorProductos[i].getIdProducto());
+            snprintf(cantidad, sizeof(cantidad), "%d", vectorCantidadVendida[i]);
+
+            imprimirFila4(pos, id, vectorProductos[i].getNombre(), cantidad);
 
             totalGeneral += vectorCantidadVendida[i];
         }
     }
 
-    cout << "---------------------------------------------------------------" << endl;
+    lineaDoble(74);
     cout << "TOTAL DE UNIDADES VENDIDAS EN EL PERIODO: " << totalGeneral << endl;
 
     //Libero la memoria dinámica utilizada
