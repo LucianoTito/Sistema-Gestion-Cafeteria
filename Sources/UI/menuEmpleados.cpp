@@ -196,13 +196,27 @@ cout << "Empleado encontrado. Datos actuales: "<<endl;
 reg.Mostrar();
 cout<<endl;
 
-//Pedir los nuevos datos (solo se puede modificar el puesto)
+//Pedir los nuevos datos (puesto y datos de contacto) reutilizando la validación general
 char nuevoPuesto[20];
+char nuevoTelefono[20];
+char nuevoMail[40];
 cout << "Ingrese el nuevo puesto: ";
 cargarCadena(nuevoPuesto, 20);
 
-//Actualizar el objeto reg en memoria
+
 reg.setPuesto(nuevoPuesto);
+
+cargarCadenaObligatoria("Ingrese el nuevo telefono: ",
+                        "El telefono no puede quedar vacio.",
+                        nuevoTelefono,
+                        20);
+reg.setTelefono(nuevoTelefono);
+
+cargarCadenaObligatoria("Ingrese el nuevo mail: ",
+                        "El mail no puede quedar vacio.",
+                        nuevoMail,
+                        40);
+reg.setMail(nuevoMail);
 
 //Grabar el registro modificado de vuelta en el archivo
 bool grabadoExitosamente = arcEmpleado.modificarRegistro(reg, posicionID);

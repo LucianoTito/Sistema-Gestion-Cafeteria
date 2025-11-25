@@ -273,7 +273,7 @@ fclose(pArchivo);
 for(int i = 0; i < cantidadActivos - 1; i++){
     for(int j = 0; j < cantidadActivos - 1 - i; j++){
         int comparacion = strcmp(clientes[j].getApellido(), clientes[j+1].getApellido());
-        if(comparacion > 0 || (comparacion == 0 && strcmp(clientes[j].getNombre(), clientes[j+1].getNombre()) > 0)){
+        if ((comparacion > 0) || ((comparacion == 0) && (strcmp(clientes[j].getNombre(), clientes[j+1].getNombre()) > 0))){
             Cliente aux = clientes[j];
             clientes[j] = clientes[j+1];
             clientes[j+1] = aux;
@@ -337,7 +337,7 @@ for(int i = 0; i < cantidadActivos - 1; i++){
         }
         else if(clientes[j].getPuntosFidelidad() == clientes[j+1].getPuntosFidelidad()){
             int comparacionApellido = strcmp(clientes[j].getApellido(), clientes[j+1].getApellido());
-            if(comparacionApellido > 0 || (comparacionApellido == 0 && strcmp(clientes[j].getNombre(), clientes[j+1].getNombre()) > 0)){
+            if((comparacionApellido > 0) || ((comparacionApellido == 0) && (strcmp(clientes[j].getNombre(), clientes[j+1].getNombre()) > 0))){
                 Cliente aux = clientes[j];
                 clientes[j] = clientes[j+1];
                 clientes[j+1] = aux;

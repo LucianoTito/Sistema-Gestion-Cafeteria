@@ -11,9 +11,11 @@ using namespace std;
 Empleado::Empleado(int id,
                    const char* nombre,
                    const char* apellido,
+                   const char* telefono,
+                   const char* mail,
                    bool eliminado,
                    const char* puesto)
-    : Persona(id, nombre, apellido, eliminado)
+    : Persona(id, nombre, apellido,telefono, mail, eliminado)
 {
     setPuesto(puesto);
 }

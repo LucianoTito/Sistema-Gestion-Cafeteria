@@ -5,7 +5,7 @@
 class Cliente : public Persona {
 
 private:
-    char _telefono[20];
+
     int _puntosFidelidad;
 
 public:
@@ -14,16 +14,15 @@ public:
     Cliente(int id = 0,
             const char* nombre = "Sin nombre",
             const char* apellido = "Sin apellido",
-            bool eliminado = false,
             const char* telefono = "Sin numero",
+            const char* mail = "Sin mail",
+            bool eliminado = false,
             int puntosFidelidad = 0);
 
     // Getters
-    const char* getTelefono();
     int getPuntosFidelidad();
 
     // Setters
-    void setTelefono(const char* telefono);
     void setPuntosFidelidad(int puntos);
 
     // Métodos

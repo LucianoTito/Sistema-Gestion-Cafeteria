@@ -449,11 +449,19 @@ cout<< endl;
 
 //Pedir los nuevos datos
 char nuevoTelefono [20];
-cout << "Ingrese el nuevo numero de telefono: ";
+char nuevoMail[40];
 
-//Modularizo con cargar cadena
-cargarCadena(nuevoTelefono, 20);
+cargarCadenaObligatoria("Ingrese el nuevo numero de telefono: ",
+                        "El telefono no puede quedar vacio.",
+                        nuevoTelefono,
+                        20);
 reg.setTelefono(nuevoTelefono);
+
+cargarCadenaObligatoria("Ingrese el nuevo mail: ",
+                        "El mail no puede quedar vacio.",
+                        nuevoMail,
+                        40);
+reg.setMail(nuevoMail);
 
 bool grabadoExitosamente = arcCliente.modificarRegistro(reg, posicionId);
 

@@ -79,5 +79,21 @@ fflush(stdin); // Limpia buffer antes de leer carácter por carácter
     palabra[i] = '\0'; // Agrega el terminador nulo
     fflush(stdin); // Limpia buffer después
 
-
 }
+
+
+//Solicita una cadena obligatoria y muestra un mensaje de error si el usuario intenta dejarla vacía
+void cargarCadenaObligatoria(const string& mensaje,
+                             const string& mensajeError,
+                             char* destino,
+                             int tamano){
+
+                             do {
+                                cout <<mensaje;
+                                cargarCadena(destino, tamano);
+                                if(destino[0] == '\0'){
+                                    cout <<mensajeError<<endl;
+                                }
+                             } while(destino[0] == '\0');
+
+                             }

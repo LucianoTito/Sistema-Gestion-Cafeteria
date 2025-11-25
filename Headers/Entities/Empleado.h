@@ -15,6 +15,8 @@ public:
     Empleado (int id = 0,
               const char* nombre = "Sin nombre",
               const char* apellido = "Sin apellido",
+              const char* telefono = "Sin numero",
+              const char* mail = "Sin mail",
               bool eliminado = false,
               const char* puesto = "Sin puesto" );
 

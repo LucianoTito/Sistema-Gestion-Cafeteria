@@ -12,10 +12,14 @@ using namespace std;
 Persona::Persona(int id,
                  const char* nombre,
                  const char* apellido,
+                 const char* telefono,
+                 const char* mail,
                  bool eliminado) {
     setId(id);
     setNombre(nombre);
     setApellido(apellido);
+    setTelefono(telefono);
+    setMail(mail);
     setEliminado(eliminado);
 }
 
@@ -23,6 +27,8 @@ Persona::Persona(int id,
 int Persona::getId() { return _id; }
 const char* Persona::getNombre() { return _nombre; }
 const char* Persona::getApellido() { return _apellido; }
+const char* Persona::getTelefono(){ return _telefono; }
+const char* Persona::getMail() { return _mail; }
 bool Persona::getEliminado() { return _eliminado; }
 
 // Setters
@@ -65,6 +71,36 @@ void Persona::setApellido(const char* apellido) {
     }
 }
 
+void Persona::setTelefono(const char* telefono){
+    if (telefono != nullptr && telefono[0] != '\0') {
+        if (strlen(telefono) < 20) {
+            strcpy(_telefono, telefono);
+        } else {
+            cout << "Telefono demasiado largo. Se cortara en 19 caracteres." << endl;
+            strncpy(_telefono, telefono, 19);
+            _telefono[19] = '\0';
+        }
+    } else {
+        cout << "Telefono invalido. Se asignara 'Sin numero'." << endl;
+        strcpy(_telefono, "Sin numero");
+    }
+}
+
+void Persona::setMail(const char* mail) {
+    if (mail != nullptr && mail[0] != '\0') {
+        if (strlen(mail) < 40) {
+            strcpy(_mail, mail);
+        } else {
+            cout << "Mail demasiado largo. Se cortara en 39 caracteres." << endl;
+            strncpy(_mail, mail, 39);
+            _mail[39] = '\0';
+        }
+    } else {
+        cout << "Mail invalido. Se asignara 'Sin mail'." << endl;
+        strcpy(_mail, "Sin mail");
+    }
+}
+
 
 void Persona::setEliminado(bool eliminado) {
     _eliminado = eliminado;
@@ -75,6 +111,8 @@ void Persona::Cargar(int id) {
 
     char nombre[30];
     char apellido[30];
+    char telefono[20];
+    char mail[40];
 
 
     setId(id);
@@ -87,6 +125,20 @@ void Persona::Cargar(int id) {
     cout << "Ingrese apellido: ";
     cargarCadena(apellido, 30);
     setApellido(apellido);
+//Se fuerza la carga de un telefono valido reutilizando la nueva validación general
+    cargarCadenaObligatoria("Ingrese telefono: ",
+                            "El telefono es obligatorio. Intente nuevamente.",
+                            telefono,
+                            20);
+    setTelefono(telefono);
+
+//Se fuerza la carga de un mail valido reutilizando la nueva validación general
+    cargarCadenaObligatoria("Ingrese mail: ",
+                            "El mail es obligatorio. Intente nuevamente.",
+                            mail,
+                            40);
+    setMail(mail);
+
 
     _eliminado = false;
     cout << "Persona cargada correctamente." << endl;
@@ -98,5 +150,7 @@ void Persona::Mostrar() {
     cout << "ID Persona: " << _id << endl;
     cout << "Nombre: " << _nombre << endl;
     cout << "Apellido: " << _apellido << endl;
+    cout << "Telefono: "<<_telefono<<endl;
+    cout << "Mail: "<<_mail <<endl;
     cout << "-----------------------------" << endl;
 }

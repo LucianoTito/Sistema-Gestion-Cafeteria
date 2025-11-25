@@ -19,10 +19,8 @@ void lineaSimple(int n) {
 }
 
 
-// Esta funcion imprime una fila completa con 5 columnas.
-// Mantengo los anchos definidos previamente para asegurar que
-// todas las tablas del sistema tengan un formato uniforme.
-//
+
+
 // COLUMNAS )
 //  - Col1: ancho 5
 //  - Col2: ancho 8
