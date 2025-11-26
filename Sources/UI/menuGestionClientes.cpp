@@ -447,21 +447,72 @@ reg.Mostrar();
 
 cout<< endl;
 
-//Pedir los nuevos datos
-char nuevoTelefono [20];
-char nuevoMail[40];
+// Menú para modificar un único campo sin volver a cargar todo el cliente
+cout << "¿Qué desea modificar?"<<endl;
+cout << "1) Nombre"<<endl;
+cout << "2) Apellido"<<endl;
+cout << "3) Telefono"<<endl;
+cout << "4) Mail"<<endl;
+cout << "0) Cancelar"<<endl;
 
-cargarCadenaObligatoria("Ingrese el nuevo numero de telefono: ",
-                        "El telefono no puede quedar vacio.",
-                        nuevoTelefono,
-                        20);
-reg.setTelefono(nuevoTelefono);
+int opcionCampo;
 
-cargarCadenaObligatoria("Ingrese el nuevo mail: ",
-                        "El mail no puede quedar vacio.",
-                        nuevoMail,
-                        40);
-reg.setMail(nuevoMail);
+// Validación de la opción elegida
+do {
+    opcionCampo = ingresarEntero("Ingrese una opcion: ");
+    if(opcionCampo < 0 || opcionCampo > 4){
+        cout << "Opcion incorrecta. Intente nuevamente."<<endl;
+    }
+} while(opcionCampo < 0 || opcionCampo > 4);
+
+// Se pide solo el dato seleccionado. Cada caso reutiliza las validaciones existentes.
+switch(opcionCampo){
+
+case 1:{
+    char nuevoNombre[30];
+    cargarCadenaObligatoria("Ingrese el nuevo nombre: ",
+                            "El nombre no puede quedar vacio.",
+                            nuevoNombre,
+                            30);
+    reg.setNombre(nuevoNombre);
+    break;
+}
+
+case 2:{
+    char nuevoApellido[30];
+    cargarCadenaObligatoria("Ingrese el nuevo apellido: ",
+                            "El apellido no puede quedar vacio.",
+                            nuevoApellido,
+                            30);
+    reg.setApellido(nuevoApellido);
+    break;
+}
+
+case 3:{
+    char nuevoTelefono [20];
+    cargarCadenaObligatoria("Ingrese el nuevo numero de telefono: ",
+                            "El telefono no puede quedar vacio.",
+                            nuevoTelefono,
+                            20);
+    reg.setTelefono(nuevoTelefono);
+    break;
+}
+
+case 4:{
+    char nuevoMail[40];
+    cargarCadenaObligatoria("Ingrese el nuevo mail: ",
+                            "El mail no puede quedar vacio.",
+                            nuevoMail,
+                            40);
+    reg.setMail(nuevoMail);
+    break;
+}
+
+case 0:
+    cout << "Modificacion cancelada por el usuario."<<endl;
+    return;
+}
+
 
 bool grabadoExitosamente = arcCliente.modificarRegistro(reg, posicionId);
 

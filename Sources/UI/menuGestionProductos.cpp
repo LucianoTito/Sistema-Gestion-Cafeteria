@@ -228,20 +228,56 @@ cout << "Producto encontrado. Datos actuales: "<<endl;
 reg.Mostrar();
 cout << endl;
 
-
-//Pedir los nuevos datos
+// Menú para elegir qué campo se desea modificar
+cout << "¿Qué desea modificar?"<<endl;
+cout << "1) Nombre"<<endl;
+cout << "2) Precio"<<endl;
+cout << "3) Stock"<<endl;
+cout << "0) Cancelar"<<endl;
 
 cout <<endl;
-float nuevoPrecio = ingresarFloat("Ingrese el nuevo precio: ");
+int opcionCampo;
 
-cout <<endl;
-int nuevoStock = ingresarEntero("Ingrese el nuevo stock: ");
+// Validamos la opción para que esté dentro del rango permitido
+do {
+    opcionCampo = ingresarEntero("Ingrese una opcion: ");
+    if(opcionCampo < 0 || opcionCampo > 3){
+        cout << "Opcion incorrecta. Intente nuevamente."<<endl;
+    }
+} while(opcionCampo < 0 || opcionCampo > 3);
 
-//Actualizamos el objeto registro en memoria
-reg.setPrecio(nuevoPrecio);
-reg.setStock(nuevoStock);
+// Según la opción, pedimos solo ese dato. Esto evita repetir toda la carga.
+switch(opcionCampo){
 
-//Grabamos el registro de nuevo en el archivo
+case 1:{
+    // Se solicita únicamente el nombre y se valida que no quede vacío.
+    char nuevoNombre[50];
+    cout << "Ingrese el nuevo nombre: ";
+    cargarCadena(nuevoNombre, 49);
+    reg.setNombre(nuevoNombre);
+    break;
+}
+
+case 2:{
+    // ingresarFloat ya valida que el precio no sea negativo y repite la pregunta si corresponde.
+    float nuevoPrecio = ingresarFloat("Ingrese el nuevo precio: ");
+    reg.setPrecio(nuevoPrecio);
+    break;
+}
+
+case 3:{
+    int nuevoStock = ingresarEntero("Ingrese el nuevo stock: ");
+    reg.setStock(nuevoStock);
+    break;
+}
+
+case 0:
+    cout << "Modificacion cancelada por el usuario."<<endl;
+    return;
+}
+
+
+//Grabamos el registro de nuevo en el archivo solo con el campo elegido
 bool grabadoExitosamente = arcProducto.modificarRegistro(reg, posicionID);
 
 if(grabadoExitosamente){

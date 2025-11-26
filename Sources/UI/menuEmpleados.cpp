@@ -100,7 +100,7 @@ bool hayEliminados = arcEmpleado.hayEmpleadosConEstadoEliminado(true);
 
 if(!hayActivos && !hayEliminados){
     cout<< endl;
-    cout<< "No hay productos activos o inactivos registrados para listar."<<endl;
+    cout<< "No hay empleados activos o inactivos registrados para listar."<<endl;
     cout<< endl;
     return;
 }
@@ -196,29 +196,83 @@ cout << "Empleado encontrado. Datos actuales: "<<endl;
 reg.Mostrar();
 cout<<endl;
 
-//Pedir los nuevos datos (puesto y datos de contacto) reutilizando la validación general
-char nuevoPuesto[20];
-char nuevoTelefono[20];
+// Menú para modificar solo un campo y evitar repetir la carga completa
+cout << "¿Qué desea modificar?"<<endl;
+cout << "1) Nombre"<<endl;
+cout << "2) Apellido"<<endl;
+cout << "3) Puesto"<<endl;
+cout << "4) Telefono"<<endl;
+cout << "5) Mail"<<endl;
+cout << "0) Cancelar"<<endl;
+
+int opcionCampo;
+
+//Validación de opción ingresada
+do {
+    opcionCampo = ingresarEntero("Ingrese una opcion: ");
+    if(opcionCampo < 0 || opcionCampo > 5){
+        cout << "Opcion incorrecta. Intente nuevamente."<<endl;
+    }
+
+}while(opcionCampo < 0 || opcionCampo > 5);
+
+switch(opcionCampo){
+
+case 1: {
+        char nuevoNombre[30];
+        cargarCadenaObligatoria("Ingrese el nuevo nombre: ",
+                                "El nombre no puede quedar vacio.",
+                                nuevoNombre,
+                                30);
+        reg.setNombre(nuevoNombre);
+        break;
+
+}
+
+case 2: {
+        char nuevoApellido[30];
+        cargarCadenaObligatoria("Ingrese el nuevo apellido: ",
+                                "El apellido no puede quedar vacio.",
+                                nuevoApellido,
+                                30);
+        reg.setApellido(nuevoApellido);
+        break;
+}
+
+case 3: {
+        char nuevoPuesto[20];
+        cout << "Ingrese el nuevo puesto: ";
+        cargarCadena(nuevoPuesto, 20);
+        reg.setPuesto(nuevoPuesto);
+        break;
+}
+
+case 4: {
+        char nuevoTelefono[20];
+        cargarCadenaObligatoria("Ingrese el nuevo telefono: ",
+                                "El telefono no puede quedar vacio.",
+                                nuevoTelefono,
+                                20);
+        reg.setTelefono(nuevoTelefono);
+        break;
+        }
+
+case 5: {
 char nuevoMail[40];
-cout << "Ingrese el nuevo puesto: ";
-cargarCadena(nuevoPuesto, 20);
-
-
-reg.setPuesto(nuevoPuesto);
-
-cargarCadenaObligatoria("Ingrese el nuevo telefono: ",
-                        "El telefono no puede quedar vacio.",
-                        nuevoTelefono,
-                        20);
-reg.setTelefono(nuevoTelefono);
-
 cargarCadenaObligatoria("Ingrese el nuevo mail: ",
                         "El mail no puede quedar vacio.",
                         nuevoMail,
                         40);
-reg.setMail(nuevoMail);
+        reg.setMail(nuevoMail);
+        break;
+}
 
-//Grabar el registro modificado de vuelta en el archivo
+
+case 0:
+    cout << "Modificacion cancelada por el usuario." <<endl;
+    return;
+}
+//Grabar el registro modificado de vuelta en el archivo con el dato actualizado
 bool grabadoExitosamente = arcEmpleado.modificarRegistro(reg, posicionID);
 
 if(grabadoExitosamente){
@@ -230,6 +284,12 @@ if(grabadoExitosamente){
 
 
 }
+
+
+
+
+
+
 
 void bajaEmpleado(){
 
