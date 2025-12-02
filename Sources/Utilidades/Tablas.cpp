@@ -76,3 +76,21 @@ void imprimirFila2(const char* c1, const char* c2) {
          << right << setw(a2) << c2 << " ||"
          << endl;
 }
+
+//MPLEMENTACIÓN PARA PEDIDOS ---
+void imprimirFilaPedido(const char* id, const char* fecha, const char* idCli, const char* idEmp, const char* total) {
+    // Anchos personalizados para que entre la fecha (10 chars) y se vea bien
+    const int wId = 8;
+    const int wFecha = 12;
+    const int wCli = 12;
+    const int wEmp = 12;
+    const int wTotal = 12;
+
+    cout << "|| "
+         << left << setw(wId) << id << " | "
+         << left << setw(wFecha) << fecha << " | "
+         << left << setw(wCli) << idCli << " | "
+         << left << setw(wEmp) << idEmp << " | "
+         << right << setw(wTotal) << total << " ||"
+         << endl;
+}

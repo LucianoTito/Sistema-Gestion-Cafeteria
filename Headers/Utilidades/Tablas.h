@@ -1,28 +1,17 @@
 #pragma once
-
-#include <iostream>
 #include <iomanip>
+#include <iostream>
 
-// Imprime una línea doble con '='
-void lineaDoble(int n);
+using namespace std;
 
-// Imprime una línea simple con '-'
-void lineaSimple(int n);
+// Funciones generales de linea
+void lineaDoble(int n = 80); // Valor por defecto para facilitar uso
+void lineaSimple(int n = 80);
 
-// Tabla básica de 2 columnas (por ejemplo MES / RECAUDACION)
+// Filas genéricas (Las que me pasaste)
+void imprimirFila5(const char* c1, const char* c2, const char* c3, const char* c4, const char* c5);
+void imprimirFila4(const char* c1, const char* c2, const char* c3, const char* c4);
 void imprimirFila2(const char* c1, const char* c2);
 
-// Tabla de 4 columnas (POS / ID / PRODUCTO / CANT)
-void imprimirFila4(const char* c1, const char* c2, const char* c3, const char* c4);
-
-
-
-
-// Tabla de 5 columnas (POS / ID / APELLIDO / NOMBRE / OTRO)
-void imprimirFila5(const char* c1,
-                   const char* c2,
-                   const char* c3,
-                   const char* c4,
-                   const char* c5);
-
-
+//Fila específica para listados de pedidos (ajustada para Fechas y Montos)
+void imprimirFilaPedido(const char* id, const char* fecha, const char* idCli, const char* idEmp, const char* total);

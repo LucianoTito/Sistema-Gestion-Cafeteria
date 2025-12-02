@@ -1,5 +1,6 @@
-#include<iostream>
+#include <iostream>
 #include <cstdlib>
+#include <cstdio> // Necesario para sprintf
 
 #include "../../Headers/UI/menuPedidos.h"
 #include "../../Headers/Entities/Cliente.h"
@@ -17,975 +18,529 @@
 #include "../../Headers/Persistence/ArchivoPagos.h"
 #include "../../Headers/Utilidades/Validaciones.h"
 #include "../../Headers/Utilidades/archivoPago.h"
+#include "../../Headers/Utilidades/Tablas.h"
 
 using namespace std;
 
-//Funciones auxiliares privadas de este módulo
+// ==========================================
+// PROTOTIPOS DE FUNCIONES AUXILIARES
+// ==========================================
 void ordenarPedidosPorFecha(Pedido vectorPedidos[], int cantidad);
-void mostrarResumenPedido(Pedido pedido);
+
+// Nuevas funciones de visualización (Tablas)
+void mostrarEncabezadoTablaPedidos();
+void mostrarFilaPedido(Pedido p);
+
+// Consultas
 void menuConsultasPedidos();
 void consultaPedidosPorRangoFechas();
 void consultaPedidosPorCliente();
 void consultaPedidosPorEmpleado();
 
+// Funciones helpers de lógica de negocio
+int seleccionarClienteValido();
+int seleccionarEmpleadoValido();
+bool cargarProductosEnPedido(Pedido &regPedido, int &cantidadDetallesIniciales);
+void actualizarStockProducto(int idProducto, int cantidad, bool devolverStock);
+void revertirCambiosStock(int idPedido);
+
+// ==========================================
+// MENU PRINCIPAL DE PEDIDOS
+// ==========================================
 void menuPedidos(){
+    int opcion;
+    while (true){
+        system ("cls");
+        lineaDoble(40);
+        cout << "          GESTION DE PEDIDOS          " << endl;
+        lineaDoble(40);
+        cout << "1. REALIZAR UN PEDIDO " << endl;
+        cout << "2. VER DETALLE DE UN PEDIDO" << endl;
+        cout << "3. LISTAR PEDIDOS (ORDENADOS POR FECHA)" << endl;
+        cout << "4. CONSULTAS DE PEDIDOS" << endl;
+        cout << "5. ANULAR UN PEDIDO (BAJA LOGICA)" << endl;
+        lineaSimple(40);
+        cout << "0. VOLVER AL MENU PRINCIPAL" << endl;
+        lineaDoble(40);
 
-int opcion;
-while (true){
-    system ("cls");
+        opcion = ingresarEntero("SELECCIONE UNA OPCION: ");
+        system ("cls");
+        bool mostrarPausa = true;
 
-    cout << "---------- GESTION DE PEDIDOS ----------" <<endl;
-    cout << "========================================" <<endl;
-    cout << "1. REALIZAR UN PEDIDO "<< endl;
-    cout << "2. VER DETALLE DE UN PEDIDO" <<endl;
-    cout << "3. LISTAR PEDIDOS (ORDENADOS POR FECHA)" <<endl;
-    cout << "4. CONSULTAS DE PEDIDOS" <<endl;
-    cout << "5. ANULAR UN PEDIDO "<<endl; //baja logica
-    cout << "----------------------------------------" <<endl;
-    cout << "0. VOLVER AL MENU PRINCIPAL" <<endl;
-    cout << "========================================"<< endl;
-
-    opcion = ingresarEntero("SELECCIONE UNA OPCION: ");
-
-    system ("cls");
-
-    bool mostrarPausa = true;
-
-    switch (opcion){
-
-case 1:
-    realizarPedido();
-    break;
-case 2:
-     verDetallePedido();
-    break;
-case 3:
-     listarPedidos();
-    break;
-case 4:
-     menuConsultasPedidos();
-     mostrarPausa = false; // Evita la pausa doble al volver desde el submenú de consultas
-    break;
-case 5:
-    anularPedido();
-    break;
-case 0:
-    return;
-default:
-    cout << "Opcion incorrecta. Vuelva a intentarlo. "<<endl;
-    break;
-
-
+        switch (opcion){
+            case 1: realizarPedido(); break;
+            case 2: verDetallePedido(); break;
+            case 3: listarPedidos(); break;
+            case 4:
+                menuConsultasPedidos();
+                mostrarPausa = false;
+                break;
+            case 5: anularPedido(); break;
+            case 0: return;
+            default: cout << "Opcion incorrecta." << endl; break;
+        }
+        if(mostrarPausa) system ("pause");
     }
-if(mostrarPausa){
-    system ("pause");
 }
 
-
-}
-
-}
-
+// ==========================================
+// FUNCION PRINCIPAL: REALIZAR PEDIDO
+// ==========================================
 void realizarPedido() {
+    ArchivoPedido arcPedido ("Pedidos.dat");
+    ArchivoDetallePedido arcDetalle ("DetallesPedidos.dat");
+    ArchivoPagos arcPagos ("Pagos.dat");
 
-ArchivoCliente arcCliente ("Clientes.dat");
-ArchivoEmpleado arcEmpleado ("Empleados.dat");
-ArchivoProducto arcProducto ("Productos.dat");
-ArchivoPedido arcPedido ("Pedidos.dat");
-ArchivoDetallePedido arcDetalle ("DetallesPedidos.dat");
-ArchivoPagos arcPagos ("Pagos.dat");
+    // Guardamos estados iniciales por si hay que revertir (Rollback simple)
+    int cantidadPedidosPrevios = arcPedido.contarRegistros();
+    int cantidadDetallesInicial = arcDetalle.contarRegistros();
 
-//Guardo una cantidad actual p/ poder revertir si algo  falla
-int cantidadPedidosPrevios = arcPedido.contarRegistros();
+    cout << "-------- REALIZAR NUEVO PEDIDO --------" << endl;
 
-//Guardo la cantidad actual de detallesPedidos por si algo falla
-int cantidadDetallesInicial = arcDetalle.contarRegistros();
+    // 1. SELECCION DE CLIENTE
+    int idCliente = seleccionarClienteValido();
+    if (idCliente == -1) return; // Cancelado o error
 
+    system("cls");
 
+    // 2. SELECCION DE EMPLEADO
+    int idEmpleado = seleccionarEmpleadoValido();
+    if (idEmpleado == -1) return;
 
-cout << "-------- REALIZAR NUEVO PEDIDO --------"<<endl;
+    system("cls");
 
-//Verifico que existan clientes activos antes de continuar
-if (!arcCliente.hayClientesConEstadoEliminado(false)){
-    cout << "No hay clientes activos para generar pedidos."<<endl;
-    cout<<endl;
-    return;
-}
+    // 3. INICIALIZAR PEDIDO EN MEMORIA
+    Pedido regPedido;
+    int idNuevoPedido = cantidadPedidosPrevios + 1;
+    regPedido.Cargar(idNuevoPedido, idCliente, idEmpleado);
 
-cout << endl << "CLIENTES DISPONIBLES: "<<endl;
-arcCliente.listar();
-
-//Valido el cin de idCliente
-int idCliente = ingresarEntero("Seleccione el ID del Cliente para este pedido: ");
-
-
-//Validar Cliente
-
-int posCliente = arcCliente.buscarRegistro(idCliente);
-
-//Existe el ID?
-
-if(posCliente == -1){
-
-    cout << "ERROR: El ID del cliente no existe. "<<endl;
-    return;
-
-}
-
-//Está activo?
-Cliente regCliente = arcCliente.leerRegistro(posCliente);
-if (regCliente.getEliminado()== true){
-
-    cout<< "ERROR: El cliente seleccionado se encuentra eliminado."<<endl;
-    return;
-}
-
-//Si pasa esos dos if, el cliente es válido.
-
-// Limpio la pantalla para que el listado de empleados quede despejado.
-system("cls");
-
-//Verifico si empleados activos p/ asignar el pedido
-if(!arcEmpleado.hayEmpleadosConEstadoEliminado(false)){
-
-    cout<< "No hay empleados disponibles para asignar el pedido."<<endl;
-    return;
-}
-
-cout<< endl << "EMPLEADOS DISPONIBLES: "<<endl;
-arcEmpleado.listar();
-
-//Valido el cin de idEmpleado
-cout<< endl;
-int idEmpleado = ingresarEntero("Seleccione el ID del Empleado que atiende este pedido: ");
-
-
-
-//Validación del EMPLEADO:
-int posEmpleado = arcEmpleado.buscarRegistro(idEmpleado);
-
-if (posEmpleado == -1){
-
-    cout<< "ERROR: El ID del empleado no existe."<<endl;
-    return;
-}
-
-Empleado regEmpleado = arcEmpleado.leerRegistro(posEmpleado);
-if (regEmpleado.getEliminado()== true){
-
-    cout << "ERROR: El empleado seleccionado se encuentra eliminado."<<endl;
-    return;
-}
-
-
-//Si cliente y empleados son válidos se puede seguir
-
-// Limpio la pantalla para comenzar la selección de productos sin información previa en pantalla.
-system("cls");
-
-//CREAR PEDIDO
-//creo obj Pedido vacío
-
-Pedido regPedido;
-
-int idNuevoPedido = cantidadPedidosPrevios + 1;
-
-
-regPedido.Cargar(idNuevoPedido, idCliente, idEmpleado);
-
-//Valido que haya productos activos p/ realizar el pedido
-if(!arcProducto.hayProductosConEstadoEliminado(false)){
-    cout << "No hay productos activos disponibles para armar el pedido."<<endl;
-    cout<<endl;
-    return;
-}
-
-//Bucle para agregar productos
-
-cout << endl << "-------- AGREGAR PRODUCTOS AL PEDIDO --------" <<endl;
-
-//Verifico que haya al menos un item antes de salir del bucle
-bool seAgregoProducto = false;
-
-while(true){
-
-        cout<< endl << "PRODUCTOS DISPONIBLES: "<<endl;
-        arcProducto.listar();
-
-        //Valido el cin de idProducto
-        cout <<endl;
-        int idProducto = ingresarEntero("Seleccione el ID del Producto a agregar (0 para terminar):");
-
-
-        //salir del bucle si el usuario ingresa 0.
-
-        if (idProducto == 0){
-
-                if(!seAgregoProducto){
-                        char cancelar;
-                cout<<"Aun no agrego productos. Desea cancelar el pedido? (S/N): ";
-                cin>> cancelar;
-                if(cancelar == 'S' || cancelar == 's'){
-                    arcDetalle.restaurarCantidadRegistros(cantidadDetallesInicial); //Vuelvo al estado original
-                    cout << "Pedido cancelado antes de cargar productos."<<endl;
-                    return;
-                }
-                system("cls");
-                continue;
-
-        }
-            break;
-        }
-
-        //Validar producto
-        //Buscar posición del producto
-        int posicionProducto = arcProducto.buscarRegistro(idProducto);
-
-        if(posicionProducto == -1){
-
-            cout << "ERROR: El ID del producto no existe. Intente de nuevo."<<endl;
-            system("pause");
-            system("cls");
-            continue; //salta al inicio del while(true) para volver a listar productos
-        }
-
-        //Leer el registro de productos para verificar el stock y estado
-        Producto regProducto = arcProducto.leerRegistro(posicionProducto);
-
-
-        //Validación, está eliminado?
-        if (regProducto.getEliminado() == true) {
-            cout << "ERROR: Ese producto (" << regProducto.getNombre() << ") ya no esta disponible (eliminado)." << endl;
-            system("pause");
-            system("cls");
-            continue; // Salta al inicio del 'while(true)'
-
-        }
-
-        // Validacion, hay stock?
-
-        if (regProducto.getStock()<=0){
-
-            cout << "ERROR: PRODUCTO SIN STOCK ("<<regProducto.getNombre() <<")." <<endl;
-            system("pause");
-            system("cls");
-            continue; // salta al inicio del while(true)
-        }
-
-        //PEDIR UNA CANTIDAD y validarla
-
-
-
-        cout <<endl << "Producto seleccionado: "<< regProducto.getNombre()<<endl;
-        cout << "Stock disponible: "<<regProducto.getStock()<<endl;
-
-        // Precio unitario atado al producto (evita ingreso manual)
-        float precioUnitario = regProducto.getPrecio();
-
-        //validacion del cin de ingresar entero
-        cout <<endl;
-        int cantidadPedida = ingresarEntero("Ingrese la cantidad deseada: ");
-
-        if (cantidadPedida <=0){
-            cout << "ERROR: La cantidad debe ser al menos de 1 (una) unidad."<<endl;
-            system("pause");
-            system("cls");
-            continue; // Salta al inicio del while
-        }
-
-
-        if (cantidadPedida > regProducto.getStock()){
-
-            cout << "ERROR: STOCK INSUFICIENTE. Hay "<<regProducto.getStock()<< "unidades disponibles."<<endl;
-            system ( "pause");
-            system ("cls");
-            continue;
-        }
-
-
-//BÚSQUEDA SECUENCIAL: Verifico si este producto ya existe en este pedido específico.
-// Retorna la posición en bytes o índice del registro en el archivo (o -1 si no existe).
-int posicionDetalleExistente = arcDetalle.buscarDetallePorPedidoYProducto(idNuevoPedido, idProducto);
-
-// Si el producto YA existe
-if(posicionDetalleExistente != -1){
-
-    // Lectura del registro original para saber cuántos había antes
-    DetallePedido detalleExistente = arcDetalle.leerRegistro(posicionDetalleExistente);
-
-    // Cálculo de la nueva cantidad total (Lo que había + lo nuevo)
-    int cantidadAcumulada = detalleExistente.getCantidad() + cantidadPedida;
-
-    //VALIDACIÓN DE STOCK
-    if(cantidadAcumulada > regProducto.getStock()){
-        cout<< "ERROR: La cantidad total solicitada supera el stock disponible."<<endl;
-        system("pause");
-        system("cls");
-
-        continue;//  salta al inicio del bucle principal, pidiendo el producto de nuevo
+    // 4. CARGA DE PRODUCTOS (Detalles)
+    if (!cargarProductosEnPedido(regPedido, cantidadDetallesInicial)) {
+        cout << "Pedido cancelado (sin productos cargados)." << endl;
+        return;
     }
 
-    //Actualización del objeto en memoria
-    detalleExistente.setCantidad(cantidadAcumulada);
-    // El precio se mantiene alineado al producto para evitar ingresos manuales.
-    detalleExistente.setPrecioUnitario(regProducto.getPrecio());
-
-    //Pre-cálculo del costo de lo que se está intentando agregar ahora
-
-float calculoSubtotalItem = precioUnitario * cantidadPedida;
-
-
-    // Si falla la escritura
-    if(!arcDetalle.modificarRegistro(detalleExistente, posicionDetalleExistente)){
-        cout<< "ERROR. No se pudo actualizar la cantidad del producto seleccionado."<<endl;
-        // deshacer cambios si algo falla
+    // 5. GRABAR PEDIDO PRINCIPAL
+    if (!arcPedido.grabarRegistro(regPedido)){
+        cout << "ERROR CRITICO: No se pudo grabar el pedido." << endl;
+        revertirCambiosStock(idNuevoPedido);
         arcDetalle.restaurarCantidadRegistros(cantidadDetallesInicial);
         return;
     }
 
-    // Actualizacion del subtotal general del pedido con el importe de los nuevos ítems
-    regPedido.setSubtotal(regPedido.getSubtotal() + calculoSubtotalItem);
-    seAgregoProducto = true; // Bandera para confirmar éxito
+    // 6. GESTIONAR PAGO
+    if (!registrarPagoParaPedido(arcPagos, regPedido)){
+        cout << "El pago no se concreto. Se revertira el pedido." << endl;
+        revertirCambiosStock(idNuevoPedido);
+        arcDetalle.restaurarCantidadRegistros(cantidadDetallesInicial);
+        arcPedido.restaurarCantidadRegistros(cantidadPedidosPrevios);
+        return;
+    }
 
-
-    cout<< "------------------------------------"<<endl;
-    cout<<endl;
-    cout<< "Cantidad de "<<regProducto.getNombre()<< " actualizada a "<<cantidadAcumulada<< " unidades."<<endl;
-    cout<< "Subtotal acumulado del Pedido: $"<<regPedido.getSubtotal()<<endl;
-    cout<< "------------------------------------"<<endl;
-    cout<<endl;
-
-    system("pause");
-    system("cls");
-
-
-    continue; //continue evita que el código siga bajando y cree un registro nuevo duplicado
+    cout << endl << "------ PEDIDO COMPLETADO EXITOSAMENTE ------" << endl;
 }
 
-        //Creación de DETALLEPEDIDO y actualizar subtotal
+// ==========================================
+// LOGICA DE CARGA DE PRODUCTOS
+// ==========================================
+bool cargarProductosEnPedido(Pedido &regPedido, int &cantidadDetallesInicial) {
+    ArchivoProducto arcProducto("Productos.dat");
+    ArchivoDetallePedido arcDetalle("DetallesPedidos.dat");
 
+    if(!arcProducto.hayProductosConEstadoEliminado(false)){
+        cout << "No hay productos activos disponibles." << endl;
+        return false;
+    }
 
+    bool seAgregoProducto = false;
+    cout << endl << "-------- AGREGAR PRODUCTOS AL PEDIDO --------" << endl;
 
-        int idDetalleNuevo = arcDetalle.contarRegistros() + 1;
+    while(true){
+        cout << endl << "PRODUCTOS DISPONIBLES: " << endl;
+        arcProducto.listar();
 
-        // El precio unitario se toma automáticamente del producto seleccionado.
+        cout << endl;
+        int idProducto = ingresarEntero("Seleccione ID Producto (0 para terminar): ");
 
-        float calculoSubtotalItem = precioUnitario * cantidadPedida;
-
-
-
-
- //Crear el objeto DetallePedido con los datos validados
-        DetallePedido regDetalle(
-            idDetalleNuevo,
-            idNuevoPedido,
-            idProducto,
-            cantidadPedida,
-            precioUnitario
-        );
-cout << endl;
-        cout << "ID Detalle asignado: "<<regDetalle.getIdDetalle()<<endl;
-        cout << "ID Pedido asociado: "<<regDetalle.getIdPedido()<< endl;
-        cout <<"ID Producto asociado: "<<regDetalle.getIdProducto()<<endl;
-        cout << "Cantidad registrada: "<< regDetalle.getCantidad() << endl;
-        cout << "Precio unitario registrado: $"<< regDetalle.getPrecioUnitario() << endl;
-
-
-        //Actualizar el subtotal del pedido principal en memoria
-        float subtotalActual = regPedido.getSubtotal();
-        regPedido.setSubtotal(subtotalActual + calculoSubtotalItem);
-
-
-        cout << "-------------------------------------------------------"<<endl;
-        cout << cantidadPedida << " unidades de "<<regProducto.getNombre()<< " agregadas."<<endl;
-        cout << "Subtotal de este item: $"<<calculoSubtotalItem <<endl;
-        cout << "Subtotal acumulado del Pedido: $"<<regPedido.getSubtotal()<<endl;
-        cout << "-------------------------------------------------------"<<endl;
-
-
-        //Grabar el detallepedido de disco
-        bool exitoDetalle = arcDetalle.grabarRegistro(regDetalle);
-
-        if (!exitoDetalle){
-
-            cout << "ERROR: No se pudo grabar este item del detalle. Cancelando pedido..."<<endl;
-
-            arcDetalle.restaurarCantidadRegistros(cantidadDetallesInicial);
-
-            system("pause");
-            return;
+        if (idProducto == 0){
+            if(!seAgregoProducto){
+                char cancelar;
+                cout << "No cargo productos. Desea cancelar el pedido? (S/N): ";
+                cin >> cancelar;
+                if(cancelar == 'S' || cancelar == 's'){
+                    arcDetalle.restaurarCantidadRegistros(cantidadDetallesInicial);
+                    return false;
+                }
+                continue;
+            }
+            break;
         }
-        seAgregoProducto = true;
-        system("pause");
-        system ("cls");
 
+        // --- Validaciones de Producto ---
+        int posProd = arcProducto.buscarRegistro(idProducto);
+        if(posProd == -1){
+            cout << "ERROR: ID inexistente." << endl; system("pause"); system("cls"); continue;
+        }
 
+        Producto regProd = arcProducto.leerRegistro(posProd);
+        if (regProd.getEliminado() || regProd.getStock() <= 0) {
+            cout << "ERROR: Producto eliminado o sin stock." << endl; system("pause"); system("cls"); continue;
+        }
 
-}// Fin del while
+        cout << "Seleccionado: " << regProd.getNombre() << " | Stock: " << regProd.getStock() << endl;
+        int cantidad = ingresarEntero("Ingrese cantidad: ");
 
-cout << "---------- FIN DE LA CARGA DE PRODUCTOS ----------"<<endl;
+        if (cantidad <= 0 || cantidad > regProd.getStock()){
+            cout << "ERROR: Cantidad invalida o stock insuficiente." << endl; system("pause"); system("cls"); continue;
+        }
 
+        // --- Logica de Insertar/Actualizar Detalle ---
+        int posDetalleExistente = arcDetalle.buscarDetallePorPedidoYProducto(regPedido.getIdPedido(), idProducto);
+        float subtotalItem = 0;
 
-// VALIDAR Y GRABAR EL PEDIDO PRINCIPAL
+        if (posDetalleExistente != -1) {
+            // -- ACTUALIZAR EXISTENTE --
+            DetallePedido detalle = arcDetalle.leerRegistro(posDetalleExistente);
+            int nuevaCant = detalle.getCantidad() + cantidad;
 
-//Validar si se agregaron productos
-if (regPedido.getSubtotal()== 0){
-    cout << "Pedido cancelado (sin productos)."<<endl;
-    arcDetalle.restaurarCantidadRegistros(cantidadDetallesInicial); //Restauro los detalles agregados en esta sesión
-    return;
-}
-
-//Grabar el Pedido ppal de memoria al archivo
-bool exitoPedido = arcPedido.grabarRegistro(regPedido);
-if (!exitoPedido){
-
-    cout << "ERROR. NO SE PUDO GRABAR EL PEDIDO PRINCIPAL."<<endl;
-
-    arcDetalle.restaurarCantidadRegistros(cantidadDetallesInicial);
-    return;
-}
-
-//CREAR Y GRABAR EL PAGO DESDE EL NUEVO MÓDULO
-if (!registrarPagoParaPedido(arcPagos, regPedido)){
-    arcDetalle.restaurarCantidadRegistros(cantidadDetallesInicial);
-    arcPedido.restaurarCantidadRegistros(cantidadPedidosPrevios);
-    return;
-}
-
-//Actualizar Stock
-cout <<endl << "Actualizando el stock de productos... "<<endl;
-
-//Obtener el ID del pedido que acabo de guardar
-int idPedidoActual = regPedido.getIdPedido();
-
-//Cuento cuantos detalles hay en el archivo para poder recorrerlo
-int cantDetalles = arcDetalle.contarRegistros();
-
-//Recorro el archivo de Detalles
-
-for (int i = 0; i<cantDetalles; i++){
-
-    DetallePedido regDetalleLeido = arcDetalle.leerRegistro(i);
-
-    //Verificar si el detalle se corresponde al pedido que acabo de hacer
-    if (regDetalleLeido.getIdPedido() == idPedidoActual){
-
-
-        //Si pertenece descontar el stock del producto correspondiente
-        int idProctoADescontar = regDetalleLeido.getIdProducto();
-        int cantidadVendida = regDetalleLeido.getCantidad();
-
-        //Buscar la posición del producto en Productos.dat
-        int posicionProducto = arcProducto.buscarRegistro(idProctoADescontar);
-
-        if (posicionProducto != -1) {
-                // Leer el registro del producto DESDE EL ARCHIVO
-                Producto productoAModificar = arcProducto.leerRegistro(posicionProducto);
-
-                // Calcular nuevo stock y actualizar el obj en RAM
-                int stockActual = productoAModificar.getStock();
-                productoAModificar.setStock(stockActual - cantidadVendida);
-
-                // Sobreescribir el producto en el archivo con el nvo stock
-                arcProducto.modificarRegistro(productoAModificar, posicionProducto);
+            if (nuevaCant > regProd.getStock()) {
+                 cout << "ERROR: La suma total supera el stock disponible." << endl; system("pause"); continue;
             }
 
+            detalle.setCantidad(nuevaCant);
+            if(arcDetalle.modificarRegistro(detalle, posDetalleExistente)){
+                subtotalItem = regProd.getPrecio() * cantidad;
+                regPedido.setSubtotal(regPedido.getSubtotal() + subtotalItem);
+
+                actualizarStockProducto(idProducto, cantidad, false); // false = restar
+                cout << "Cantidad actualizada." << endl;
+                seAgregoProducto = true;
+            }
+        } else {
+            // -- CREAR NUEVO DETALLE --
+            int idDetalle = arcDetalle.contarRegistros() + 1;
+            DetallePedido nuevoDetalle(idDetalle, regPedido.getIdPedido(), idProducto, cantidad, regProd.getPrecio());
+
+            if (arcDetalle.grabarRegistro(nuevoDetalle)) {
+                subtotalItem = regProd.getPrecio() * cantidad;
+                regPedido.setSubtotal(regPedido.getSubtotal() + subtotalItem);
+
+                actualizarStockProducto(idProducto, cantidad, false); // false = restar
+                cout << "Producto agregado." << endl;
+                seAgregoProducto = true;
+            }
+        }
+        system("pause");
+        system("cls");
+    }
+    return seAgregoProducto;
+}
+
+// ==========================================
+// ANULAR PEDIDO
+// ==========================================
+void anularPedido () {
+    ArchivoPedido arcPedido("Pedidos.dat");
+
+    cout << "---------- ANULAR PEDIDO ----------" << endl;
+
+    if(!arcPedido.hayPedidosConEstado(false)){
+        cout << "No hay pedidos activos." << endl; return;
     }
 
+    // Aquí podrías llamar a listarPedidos() para verlos en tabla antes de anular
+    arcPedido.listarPorEstado(false);
+    cout << endl;
+
+    int idAnular = ingresarEntero("ID del Pedido a anular: ");
+    int pos = arcPedido.buscarRegistro(idAnular);
+
+    if (pos == -1){
+        cout << "Pedido no encontrado." << endl; return;
+    }
+
+    Pedido regPedido = arcPedido.leerRegistro(pos);
+    if (regPedido.getEliminado()){
+        cout << "El pedido ya esta anulado." << endl; return;
+    }
+
+    cout << endl << "Detalle del pedido a anular:" << endl;
+    mostrarEncabezadoTablaPedidos();
+    mostrarFilaPedido(regPedido);
+    lineaSimple(70);
+
+    char conf;
+    cout << "Seguro desea anular? (S/N): ";
+    cin >> conf;
+
+    if (conf == 'S' || conf == 's'){
+        cout << "Restaurando stock..." << endl;
+        revertirCambiosStock(idAnular);
+
+        regPedido.setEliminado(true);
+        if (arcPedido.modificarRegistro(regPedido, pos)){
+            cout << "Pedido anulado exitosamente." << endl;
+        } else {
+            cout << "Error al actualizar estado del pedido." << endl;
+        }
+    }
 }
 
-
-
-cout << "Stock actualizado." <<endl;
-cout << "------ PEDIDO COMPLETADO EXITOSAMENTE ------"<<endl;
-
-
-
+// ==========================================
+// FUNCIONES AUXILIARES (STOCK & SELECCION)
+// ==========================================
+void actualizarStockProducto(int idProducto, int cantidad, bool devolverStock) {
+    ArchivoProducto arc("Productos.dat");
+    int pos = arc.buscarRegistro(idProducto);
+    if (pos != -1) {
+        Producto p = arc.leerRegistro(pos);
+        int stockActual = p.getStock();
+        if (devolverStock) p.setStock(stockActual + cantidad);
+        else p.setStock(stockActual - cantidad);
+        arc.modificarRegistro(p, pos);
+    }
 }
 
+void revertirCambiosStock(int idPedido) {
+    ArchivoDetallePedido arcDetalle("DetallesPedidos.dat");
+    int total = arcDetalle.contarRegistros();
+    for(int i=0; i<total; i++){
+        DetallePedido det = arcDetalle.leerRegistro(i);
+        if(det.getIdPedido() == idPedido){
+            actualizarStockProducto(det.getIdProducto(), det.getCantidad(), true);
+        }
+    }
+}
+
+int seleccionarClienteValido() {
+    ArchivoCliente arc("Clientes.dat");
+    if (!arc.hayClientesConEstadoEliminado(false)){
+        cout << "No hay clientes activos." << endl; return -1;
+    }
+    cout << "CLIENTES DISPONIBLES:" << endl;
+    arc.listar();
+    int id = ingresarEntero("Seleccione ID Cliente: ");
+    int pos = arc.buscarRegistro(id);
+    if (pos != -1 && !arc.leerRegistro(pos).getEliminado()) return id;
+
+    cout << "Cliente invalido." << endl; system("pause");
+    return -1;
+}
+
+int seleccionarEmpleadoValido() {
+    ArchivoEmpleado arc("Empleados.dat");
+    if (!arc.hayEmpleadosConEstadoEliminado(false)){
+        cout << "No hay empleados activos." << endl; return -1;
+    }
+    cout << "EMPLEADOS DISPONIBLES:" << endl;
+    arc.listar();
+    int id = ingresarEntero("Seleccione ID Empleado: ");
+    int pos = arc.buscarRegistro(id);
+    if (pos != -1 && !arc.leerRegistro(pos).getEliminado()) return id;
+
+    cout << "Empleado invalido." << endl; system("pause");
+    return -1;
+}
+
+// ==========================================
+// FUNCIONES DE CONSULTA Y LISTADO (TABLAS)
+// ==========================================
 
 void listarPedidos() {
+    ArchivoPedido arcPedido ("Pedidos.dat");
+    cout << "---------- LISTADO DE PEDIDOS POR FECHA ----------" << endl;
 
-//obj para la capa de Persistencia
+    int cant = arcPedido.contarRegistros();
+    if(cant == 0){ cout << "Sin registros." << endl; return; }
 
-ArchivoPedido arcPedido ("Pedidos.dat");
-
-cout << "---------- LISTADO DE PEDIDOS ORDENADOS POR FECHA ----------"<<endl;
-
-int cantidadRegistros = arcPedido.contarRegistros();
-
-if(cantidadRegistros == 0){
-    cout << "No hay pedidos cargados en el sistema."<<endl;
-    return;
-}
-//Reservo memoria para copiar los pedidos y luego ordenarlos sin modificar el archivo
-Pedido *vectorPedidos = new Pedido[cantidadRegistros];
-
-int cantidadValidos = 0;
-
-//Recorro el archivo copiando los pedidos existentes
-for(int i=0; i<cantidadRegistros; i++){
-    Pedido reg = arcPedido.leerRegistro(i);
-    if(reg.getIdPedido() != -1){
-        vectorPedidos[cantidadValidos] = reg;
-        cantidadValidos++;
+    Pedido *vector = new Pedido[cant];
+    int validos = 0;
+    for(int i=0; i<cant; i++){
+        Pedido p = arcPedido.leerRegistro(i);
+        if(p.getIdPedido() != -1) vector[validos++] = p;
     }
-}
 
-if(cantidadValidos == 0){
-    cout << "No se encontraron pedidos válidos para mostrar."<<endl;
-    delete[] vectorPedidos;
-    return;
-}
+    if(validos > 0) ordenarPedidosPorFecha(vector, validos);
 
-//Ordeno el vector por fecha utilizando burbujeo
-ordenarPedidosPorFecha(vectorPedidos, cantidadValidos);
-
-bool hayActivos = false;
-bool hayAnulados = false;
-
-cout << endl << "------- PEDIDOS ACTIVOS -------" << endl;
-for(int i=0; i<cantidadValidos; i++){
-    if(vectorPedidos[i].getEliminado() == false){
-        mostrarResumenPedido(vectorPedidos[i]);
-        hayActivos = true;
+    // --- ACTIVOS ---
+    cout << endl << ">>> PEDIDOS ACTIVOS" << endl;
+    mostrarEncabezadoTablaPedidos();
+    bool hayActivos = false;
+    for(int i=0; i<validos; i++) {
+        if(!vector[i].getEliminado()){
+            mostrarFilaPedido(vector[i]);
+            hayActivos = true;
+        }
     }
-}
+    if (!hayActivos) cout << "|| (No hay pedidos activos)" << endl;
+    lineaDoble(70);
 
-if(!hayActivos){
-    cout << "No hay pedidos activos para mostrar."<<endl;
-}
-
-cout << endl << "------- PEDIDOS ANULADOS -------" << endl;
-for(int i=0; i<cantidadValidos; i++){
-    if(vectorPedidos[i].getEliminado() == true){
-        mostrarResumenPedido(vectorPedidos[i]);
-        hayAnulados = true;
+    // --- ANULADOS ---
+    cout << endl << ">>> PEDIDOS ANULADOS" << endl;
+    mostrarEncabezadoTablaPedidos();
+    bool hayAnulados = false;
+    for(int i=0; i<validos; i++) {
+        if(vector[i].getEliminado()){
+            mostrarFilaPedido(vector[i]);
+            hayAnulados = true;
+        }
     }
-}
+    if (!hayAnulados) cout << "|| (No hay pedidos anulados)" << endl;
+    lineaDoble(70);
 
-if(!hayAnulados){
-    cout << "No hay pedidos anulados para mostrar."<<endl;
-}
-
-cout << endl << "------- FIN DEL LISTADO -------" << endl;
-
-delete[] vectorPedidos;
-
+    delete[] vector;
 }
 
 void menuConsultasPedidos(){
+    int opcion;
+    while(true){
+        system("cls");
+        lineaDoble(40);
+        cout << "      CONSULTAS DE PEDIDOS" << endl;
+        lineaDoble(40);
+        cout << "1. POR RANGO DE FECHAS" << endl;
+        cout << "2. POR CLIENTE" << endl;
+        cout << "3. POR EMPLEADO" << endl;
+        lineaSimple(40);
+        cout << "0. VOLVER" << endl;
+        lineaDoble(40);
 
-int opcion;
-
-while(true){
-    system("cls");
-    cout << "---------- CONSULTAS DE PEDIDOS ----------"<<endl;
-    cout << "========================================="<<endl;
-    cout << "1. CONSULTAR POR RANGO DE FECHAS"<<endl;
-    cout << "2. CONSULTAR POR CLIENTE"<<endl;
-    cout << "3. CONSULTAR POR EMPLEADO"<<endl;
-    cout << "-----------------------------------------"<<endl;
-    cout << "0. VOLVER"<<endl;
-    cout << "========================================="<<endl;
-
-    opcion = ingresarEntero("SELECCIONE UNA OPCION: ");
-    system("cls");
-
-    switch(opcion){
-    case 1:
-        consultaPedidosPorRangoFechas();
-        break;
-    case 2:
-        consultaPedidosPorCliente();
-        break;
-    case 3:
-        consultaPedidosPorEmpleado();
-        break;
-    case 0:
-        return;
-    default:
-        cout << "Opcion incorrecta. Vuelva a intentarlo."<<endl;
-        break;
+        opcion = ingresarEntero("OPCION: ");
+        system("cls");
+        switch(opcion){
+            case 1: consultaPedidosPorRangoFechas(); break;
+            case 2: consultaPedidosPorCliente(); break;
+            case 3: consultaPedidosPorEmpleado(); break;
+            case 0: return;
+            default: cout << "Incorrecto." << endl; break;
+        }
+        system("pause");
     }
-
-    system("pause");
-}
-
 }
 
 void consultaPedidosPorRangoFechas(){
+    ArchivoPedido arc("Pedidos.dat");
+    if(!arc.hayPedidosConEstado(false)){ cout << "Sin pedidos activos." << endl; return;}
 
-ArchivoPedido arcPedido("Pedidos.dat");
+    cout << "Ingrese RANGO DE FECHAS:" << endl;
+    cout << "Desde: " << endl; Fecha f1; f1.Cargar();
+    cout << endl << "Hasta: " << endl; Fecha f2; f2.Cargar();
 
-cout << "---------- CONSULTA DE PEDIDOS POR RANGO DE FECHAS ----------"<<endl;
+    if(f2 < f1) { cout << "Rango invalido." << endl; return; }
 
-if(!arcPedido.hayPedidosConEstado(false)){
-    cout << "No hay pedidos activos cargados en el sistema."<<endl;
-    return;
-}
-
-//Solicito las fechas al usuario
-Fecha fechaDesde, fechaHasta;
-
-cout << "Ingrese la FECHA DESDE:"<<endl;
-fechaDesde.Cargar();
-
-cout << endl << "Ingrese la FECHA HASTA:"<<endl;
-fechaHasta.Cargar();
-
-//Valido que la fecha hasta no sea anterior a la fecha desde
-if(fechaHasta < fechaDesde){
-    cout << "ERROR: La fecha final no puede ser anterior a la fecha inicial."<<endl;
-    return;
-}
-
-int cantidadRegistros = arcPedido.contarRegistros();
-int coincidencias = 0;
-
-cout << endl;
-cout << "Pedidos encontrados entre ";
-cout << fechaDesde.getDia() << "/" << fechaDesde.getMes() << "/" << fechaDesde.getAnio();
-cout << " y " << fechaHasta.getDia() << "/" << fechaHasta.getMes() << "/" << fechaHasta.getAnio() << endl;
-cout << "-------------------------------------------------------------"<<endl;
-
-// Recorro todos los pedidos para verificar cuáles se encuentran en el rango solicitado
-for(int i=0; i<cantidadRegistros; i++){
-    Pedido reg = arcPedido.leerRegistro(i);
-
-    if(reg.getEliminado()==false &&
-       reg.getFecha() >= fechaDesde &&
-       reg.getFecha() <= fechaHasta){
-
-        mostrarResumenPedido(reg);
-        coincidencias++;
+    cout << endl;
+    mostrarEncabezadoTablaPedidos();
+    int cant = arc.contarRegistros();
+    int cont = 0;
+    for(int i=0; i<cant; i++){
+        Pedido p = arc.leerRegistro(i);
+        if(!p.getEliminado() && p.getFecha() >= f1 && p.getFecha() <= f2) {
+            mostrarFilaPedido(p);
+            cont++;
+        }
     }
-}
-
-if(coincidencias == 0){
-    cout << "No se encontraron pedidos en el periodo indicado."<<endl;
-}else{
-    cout << "-------------------------------------------------------------"<<endl;
-    cout << "Total de pedidos encontrados: "<< coincidencias << endl;
-}
-
+    lineaSimple(70);
+    cout << "Total encontrados: " << cont << endl;
 }
 
 void consultaPedidosPorCliente(){
+    int id = seleccionarClienteValido();
+    if(id == -1) return;
 
-ArchivoCliente arcCliente("Clientes.dat");
-ArchivoPedido arcPedido("Pedidos.dat");
+    ArchivoPedido arc("Pedidos.dat");
+    int cant = arc.contarRegistros();
 
-cout << "---------- CONSULTA DE PEDIDOS POR CLIENTE ----------"<<endl;
-
-if(!arcCliente.hayClientesConEstadoEliminado(false)){
-    cout << "No hay clientes activos en el sistema."<<endl;
-    return;
-}
-
-cout << endl << "CLIENTES ACTIVOS:"<<endl;
-arcCliente.listar();
-
-int idCliente = ingresarEntero("Ingrese el ID del cliente a consultar: ");
-
-int posicionCliente = arcCliente.buscarRegistro(idCliente);
-
-if(posicionCliente == -1){
-    cout << "ERROR: El ID del cliente no existe."<<endl;
-    return;
-}
-
-Cliente regCliente = arcCliente.leerRegistro(posicionCliente);
-
-if(regCliente.getEliminado()){
-    cout << "ERROR: El cliente seleccionado está eliminado."<<endl;
-    return;
-}
-
-int cantidadRegistros = arcPedido.contarRegistros();
-int coincidencias = 0;
-
-cout << endl << "Pedidos asociados al cliente ID "<< idCliente << ":"<<endl;
-cout << "-------------------------------------------------------------"<<endl;
-
-// Filtro todos los pedidos del archivo por el ID del cliente seleccionado
-for(int i=0; i<cantidadRegistros; i++){
-    Pedido reg = arcPedido.leerRegistro(i);
-
-    if(reg.getEliminado()==false && reg.getIdCliente() == idCliente){
-        mostrarResumenPedido(reg);
-        coincidencias++;
+    cout << endl << "Pedidos del cliente ID " << id << ":" << endl;
+    mostrarEncabezadoTablaPedidos();
+    for(int i=0; i<cant; i++){
+        Pedido p = arc.leerRegistro(i);
+        if(!p.getEliminado() && p.getIdCliente() == id) mostrarFilaPedido(p);
     }
-}
-
-if(coincidencias == 0){
-    cout << "No se encontraron pedidos activos para este cliente."<<endl;
-}else{
-    cout << "-------------------------------------------------------------"<<endl;
-    cout << "Total de pedidos del cliente: "<< coincidencias << endl;
-}
-
+    lineaSimple(70);
 }
 
 void consultaPedidosPorEmpleado(){
+    int id = seleccionarEmpleadoValido();
+    if(id == -1) return;
 
-ArchivoEmpleado arcEmpleado("Empleados.dat");
-ArchivoPedido arcPedido("Pedidos.dat");
+    ArchivoPedido arc("Pedidos.dat");
+    int cant = arc.contarRegistros();
 
-cout << "---------- CONSULTA DE PEDIDOS POR EMPLEADO ----------"<<endl;
-
-if(!arcEmpleado.hayEmpleadosConEstadoEliminado(false)){
-    cout << "No hay empleados activos para realizar la consulta."<<endl;
-    return;
-}
-
-cout << endl << "EMPLEADOS ACTIVOS:"<<endl;
-arcEmpleado.listar();
-
-int idEmpleado = ingresarEntero("Ingrese el ID del empleado a consultar: ");
-
-int posicionEmpleado = arcEmpleado.buscarRegistro(idEmpleado);
-
-if(posicionEmpleado == -1){
-    cout << "ERROR: El ID del empleado no existe."<<endl;
-    return;
-}
-
-Empleado regEmpleado = arcEmpleado.leerRegistro(posicionEmpleado);
-
-if(regEmpleado.getEliminado()){
-    cout << "ERROR: El empleado seleccionado está eliminado."<<endl;
-    return;
-}
-
-int cantidadRegistros = arcPedido.contarRegistros();
-int coincidencias = 0;
-
-cout << endl << "Pedidos atendidos por el empleado ID "<< idEmpleado << ":"<<endl;
-cout << "-------------------------------------------------------------"<<endl;
-
-for(int i=0; i<cantidadRegistros; i++){
-    Pedido reg = arcPedido.leerRegistro(i);
-
-    if(reg.getEliminado()==false && reg.getIdEmpleado() == idEmpleado){
-        mostrarResumenPedido(reg);
-        coincidencias++;
+    cout << endl << "Pedidos del empleado ID " << id << ":" << endl;
+    mostrarEncabezadoTablaPedidos();
+    for(int i=0; i<cant; i++){
+        Pedido p = arc.leerRegistro(i);
+        if(!p.getEliminado() && p.getIdEmpleado() == id) mostrarFilaPedido(p);
     }
+    lineaSimple(70);
 }
 
-if(coincidencias == 0){
-    cout << "No se encontraron pedidos activos para este empleado."<<endl;
-}else{
+// ==========================================
+// UTILERIAS DE VISUALIZACION
+// ==========================================
 
-    cout << "-------------------------------------------------------------"<<endl;
-    cout << "Total de pedidos atendidos: "<< coincidencias << endl;
+void mostrarEncabezadoTablaPedidos() {
+    lineaDoble(70);
+    // Llama a la funcion de Tablas.h con los titulos
+    imprimirFilaPedido("ID", "FECHA", "ID CLIENTE", "ID EMPL.", "TOTAL ($)");
+    lineaSimple(70);
 }
+
+void mostrarFilaPedido(Pedido p) {
+    char sId[15], sFecha[15], sCli[15], sEmp[15], sTotal[20];
+    Fecha f = p.getFecha();
+
+    // Formateamos los datos para que entren en la tabla como texto
+    sprintf(sId, "%d", p.getIdPedido());
+    sprintf(sFecha, "%02d/%02d/%04d", f.getDia(), f.getMes(), f.getAnio());
+    sprintf(sCli, "%d", p.getIdCliente());
+    sprintf(sEmp, "%d", p.getIdEmpleado());
+    sprintf(sTotal, "$ %.2f", p.getTotal());
+
+    imprimirFilaPedido(sId, sFecha, sCli, sEmp, sTotal);
 }
 
-
-//Ordeno el vector recibido por parámetro utilizando el campo Fecha. Aplico burbujeo
-void ordenarPedidosPorFecha(Pedido vectorPedidos[], int cantidad){
-
+void ordenarPedidosPorFecha(Pedido vector[], int cantidad){
     for(int i=0; i<cantidad-1; i++){
         for(int j=i+1; j<cantidad; j++){
-            // Si la fecha del pedido j es anterior a la del pedido i, se intercambian posiciones
-            if(vectorPedidos[j].getFecha() < vectorPedidos[i].getFecha()){
-                Pedido aux = vectorPedidos[i];
-                vectorPedidos[i] = vectorPedidos[j];
-                vectorPedidos[j] = aux;
+            if(vector[j].getFecha() < vector[i].getFecha()){
+                Pedido aux = vector[i]; vector[i] = vector[j]; vector[j] = aux;
             }
         }
     }
 }
-
-//Muestra un resumen en una sola línea para facilitar la lectura de los listados
-void mostrarResumenPedido(Pedido pedido){
-
-    Fecha fecha = pedido.getFecha();
-
-    cout << "ID: " << pedido.getIdPedido()
-         << " | Fecha: " << fecha.getDia() << "/" << fecha.getMes() << "/" << fecha.getAnio()
-         << " | Cliente: " << pedido.getIdCliente()
-         << " | Empleado: " << pedido.getIdEmpleado()
-         << " | Mesa: " << pedido.getNroMesa()
-         << " | Total: $" << pedido.getTotal()
-         << endl;
-}
-
-
-
-
-
-
-
-
 
 void verDetallePedido(){
+    ArchivoPedido arcP("Pedidos.dat");
+    ArchivoDetallePedido arcD("DetallesPedidos.dat");
+    ArchivoProducto arcProd("Productos.dat");
+    ArchivoPagos arcPagos("Pagos.dat");
 
-//objs de persistencia necesarios
-ArchivoPedido arcPedido("Pedidos.dat");
-ArchivoDetallePedido arcDetalle("DetallesPedidos.dat");
-ArchivoProducto arcProducto ("Productos.dat");
-ArchivoPagos arcPagos("Pagos.dat");
+    int id = ingresarEntero("Ingrese ID Pedido: ");
+    int pos = arcP.buscarRegistro(id);
+    if(pos == -1){ cout << "No existe." << endl; return; }
 
-
-
-cout << "---------- VER DETALLE DE PEDIDO ----------"<<endl;
-
-cout << endl;
-int idPedidoBuscar = ingresarEntero("Ingrese el ID del Pedido que desea ver: ");
-
-
-
-//Buscar y validar el pedido principal
-int posicionPedido = arcPedido.buscarRegistro(idPedidoBuscar);
-
-if (posicionPedido == -1){
-
-    cout << "ERROR: No se encontro un Pedido con ese ID."<<endl;
-    return;
-
-}
-
-Pedido regPedido = arcPedido.leerRegistro(posicionPedido);
-
-if (regPedido.getEliminado() == true){
-
-    cout << "Este pedido se encuentra anulado. No se mostrara su detalle."<<endl;
-
-}
-
-cout << endl << "======================================"<<endl;
-cout << "MOSTRANDO PEDIDO ID: "<< regPedido.getIdPedido()<<endl;
-regPedido.Mostrar();
-
-cout << endl << "---------- DETALLES DE PRODUCTOS ----------"<<endl;
-int cantidadDetalles = arcDetalle.contarRegistros();
-bool detallesEncontrados = false; //Bandera p/ saber si se encuentra al menos un detalle de producto pedido
-
-for (int i = 0; i<cantidadDetalles; i++){
-    DetallePedido regDetalleLeido = arcDetalle.leerRegistro(i);
-
-    //Busco detalles que coincida con el ID del pedido
-    if (regDetalleLeido.getIdPedido() == idPedidoBuscar){
-        detallesEncontrados = true;
-
-        //Obtengo el nombre del producto (en lugar de solo el ID)
-        int posicionProducto = arcProducto.buscarRegistro(regDetalleLeido.getIdProducto()); //Cruce de dados entre el archivo Detalles y el archivo productos
-        Producto regProducto = arcProducto.leerRegistro(posicionProducto);
-
-        cout << "- Item: "<<regDetalleLeido.getIdDetalle()<<endl;
-        cout << "  Producto: "<<regProducto.getNombre()<< " (ID: "<<regProducto.getIdProducto()<< ")"<<endl;
-        cout << "  Cantidad: "<<regDetalleLeido.getCantidad() <<endl;
-        cout << "  Precio Unitario: $" << regDetalleLeido.getPrecioUnitario()<< endl;
-
-    }
-}
-
-if (!detallesEncontrados){
-    cout << "Este pedido no tiene productos asociados: "<<endl;
-}
-
-
-cout << "---------- INFORMACION DEL PAGO ----------"<<endl;
-
-mostrarPagoDePedido(arcPagos, idPedidoBuscar);
-
-cout << "======================================"<<endl <<endl;
-
-
-}
-
-void anularPedido () {
-    //Instancio los gestores de archivos que utilizaré
-    ArchivoPedido arcPedido("Pedidos.dat");
-    ArchivoDetallePedido arcDetalle("DetallesPedidos.dat");
-    ArchivoProducto arcProducto ("Productos.dat");
-
-
-    cout << "---------- ANULAR PEDIDO ----------"<<endl;
-
-    if(!arcPedido.hayPedidosConEstado(false)){
-        cout<< "No hay pedidos activos para anular."<<endl;
-        return;
-    }
-    //Listo pedidos activos
-    arcPedido.listarPorEstado(false);
-
-    cout <<endl;
-    int idAnular = ingresarEntero("Ingrese el ID del Pedido que desea anular: ");
-
-    //Buscar y validar el Pedido ppal
-    int posicionPedido = arcPedido.buscarRegistro(idAnular);
-
-    if (posicionPedido == -1){
-        cout << "ERROR: No se encontro un Pedido con ese ID."<<endl;
-        return;
-    }
-    //Leo el obj en memoria
-    Pedido regPedido = arcPedido.leerRegistro(posicionPedido);
-
-    cout << "Pedido encontrado: "<<endl;
-    regPedido.Mostrar();
+    Pedido p = arcP.leerRegistro(pos);
     cout << endl;
+    lineaDoble(50);
+    cout << " PEDIDO: " << p.getIdPedido() << (p.getEliminado() ? " [ANULADO]" : " [ACTIVO]") << endl;
+    lineaDoble(50);
 
-    //Y si ya estaba anulado?
-    if (regPedido.getEliminado() == true){
-
-        cout << "Este pedido ya se encuentra anulado. "<<endl;
-        return;
-    }
-
-    char confirmacion;
-    cout << "Esta seguro que desea anular este pedido? (S/N)";
-    cin >> confirmacion;
-
-    if (confirmacion == 'S' || confirmacion == 's'){
-
-        cout << "Devolviendo stock de productos... "<<endl;
-
-
-        //Nucleo de la fn Restauraciónd de stock
-        int cantidadDetalles = arcDetalle.contarRegistros();
-        for (int i = 0; i < cantidadDetalles; i++){
-            DetallePedido regDetalleLeido = arcDetalle.leerRegistro(i);
-
-            if (regDetalleLeido.getIdPedido()==idAnular){
-
-                int idProducto = regDetalleLeido.getIdProducto();
-                int cantidadDevolver = regDetalleLeido.getCantidad();
-
-                //Buscar el producto
-                int posicionProducto = arcProducto.buscarRegistro(idProducto);
-
-                if (posicionProducto != -1){
-
-                    //Leer producto
-                    Producto regProducto = arcProducto.leerRegistro(posicionProducto);
-
-                    //Sumarle el stock devuelto
-                    regProducto.setStock(regProducto.getStock() + cantidadDevolver);
-
-                    //Sobreescribir el producto
-                    arcProducto.modificarRegistro(regProducto, posicionProducto);
-                }
-            }
+    // Listado de productos en formato simple (o podrias crear tabla si quieres)
+    int cant = arcD.contarRegistros();
+    cout << " PRODUCTOS: " << endl;
+    lineaSimple(50);
+    for(int i=0; i<cant; i++){
+        DetallePedido d = arcD.leerRegistro(i);
+        if(d.getIdPedido() == id){
+            int posProd = arcProd.buscarRegistro(d.getIdProducto());
+            Producto prod = arcProd.leerRegistro(posProd);
+            cout << " * " << prod.getNombre() << " (x" << d.getCantidad() << ")"
+                 << " - Unit: $" << d.getPrecioUnitario() << endl;
         }
-        cout << "Stock devuelto."<<endl;
-
-        //ANULAR PEDIDO (BAJA LOGICA)
-        regPedido.setEliminado(true);//Actualiza el obj en RAM
-        bool exito = arcPedido.modificarRegistro(regPedido, posicionPedido);
-
-        if (exito){
-            cout << "Pedido anulado exitosamente. "<<endl;
-
-        }else {
-                cout << "ERROR: No se pudo anular el pedido"<<endl;
-        }
-
-    } else {
-                cout << "Operacion cancelada."<<endl;
     }
+    lineaSimple(50);
+    cout << " INFORMACION DE PAGO: " << endl;
+    mostrarPagoDePedido(arcPagos, id);
+    cout << endl;
 }
-
