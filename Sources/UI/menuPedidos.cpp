@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cstdlib>
-#include <cstdio> // Necesario para sprintf
+#include <cstdio>
+
 
 #include "../../Headers/UI/menuPedidos.h"
 #include "../../Headers/Entities/Cliente.h"
@@ -22,25 +23,22 @@
 
 using namespace std;
 
-// Ancho estandarizado para este módulo
+// Constante para mantener la coherencia visual en todo el menú.
 const int ANCHO_MENU = 74;
 
 // ==========================================
 // PROTOTIPOS DE FUNCIONES AUXILIARES
 // ==========================================
 void ordenarPedidosPorFecha(Pedido vectorPedidos[], int cantidad);
-
-// Visualización (Tablas)
 void mostrarEncabezadoTablaPedidos();
 void mostrarFilaPedido(Pedido p);
-
-// Consultas
 void menuConsultasPedidos();
 void consultaPedidosPorRangoFechas();
 void consultaPedidosPorCliente();
 void consultaPedidosPorEmpleado();
 
-// Helpers de lógica de negocio
+// Helpers importantes:
+// Permiten aislar la lógica compleja (como buscar y validar) del flujo principal.
 int seleccionarClienteValido();
 int seleccionarEmpleadoValido();
 bool cargarProductosEnPedido(Pedido &regPedido, int &cantidadDetallesIniciales);
@@ -52,6 +50,7 @@ void revertirCambiosStock(int idPedido);
 // ==========================================
 void menuPedidos(){
     int opcion;
+
     while (true){
         system ("cls");
         lineaDoble(ANCHO_MENU);
@@ -76,10 +75,10 @@ void menuPedidos(){
             case 3: listarPedidos(); break;
             case 4:
                 menuConsultasPedidos();
-                mostrarPausa = false; // El submenú gestiona sus pausas
+                mostrarPausa = false; // No pausamos aquí porque el submenú ya tiene sus pausas.
                 break;
             case 5: anularPedido(); break;
-            case 0: return;
+            case 0: return; // Rompe el while(true) y vuelve al main.
             default: cout << "Opcion incorrecta." << endl; break;
         }
         if(mostrarPausa) system ("pause");
@@ -87,52 +86,61 @@ void menuPedidos(){
 }
 
 // ==========================================
-// FUNCION PRINCIPAL: REALIZAR PEDIDO
+// FUNCION PRINCIPAL: REALIZAR PEDIDO (ALTA)
 // ==========================================
+// Esta función orquesta todo el proceso de venta. Es como el "Main" de una transacción.
 void realizarPedido() {
+    // Instanciamos los gestores de archivos necesarios.
     ArchivoPedido arcPedido ("Pedidos.dat");
     ArchivoDetallePedido arcDetalle ("DetallesPedidos.dat");
     ArchivoPagos arcPagos ("Pagos.dat");
 
+    // Guardamos la cantidad actual de registros para saber el ID del nuevo pedido
+    // y para poder restaurar el archivo si algo sale mal (rollback manual).
     int cantidadPedidosPrevios = arcPedido.contarRegistros();
     int cantidadDetallesInicial = arcDetalle.contarRegistros();
 
     cout << "-------- REALIZAR NUEVO PEDIDO --------" << endl;
 
-    // 1. SELECCION DE CLIENTE
+    // 1. VALIDACIÓN DE CLIENTE
+    // Usamos una función helper que se encarga de mostrar la lista y validar que el ID exista y esté activo.
     int idCliente = seleccionarClienteValido();
-    if (idCliente == -1) return;
+    if (idCliente == -1) return; // Si retorna -1, el usuario canceló o hubo error.
 
     system("cls");
 
-    // 2. SELECCION DE EMPLEADO
+    // 2. VALIDACIÓN DE EMPLEADO
     int idEmpleado = seleccionarEmpleadoValido();
     if (idEmpleado == -1) return;
 
     system("cls");
 
-    // 3. INICIALIZAR PEDIDO EN MEMORIA
+    // 3. CREACIÓN DEL ENCABEZADO DEL PEDIDO (EN MEMORIA)
     Pedido regPedido;
-    int idNuevoPedido = cantidadPedidosPrevios + 1;
+    int idNuevoPedido = cantidadPedidosPrevios + 1; // ID Autonumérico
+    // Cargar() pedirá datos extra como el Nro de Mesa y establecerá la Fecha actual.
     regPedido.Cargar(idNuevoPedido, idCliente, idEmpleado);
 
-    // 4. CARGA DE PRODUCTOS
+    // 4. CARGA DE PRODUCTOS (EL DETALLE)
+    // Pasamos 'regPedido' por referencia (&) porque al agregar productos, el SUBTOTAL del pedido cambiará.
     if (!cargarProductosEnPedido(regPedido, cantidadDetallesInicial)) {
         cout << "Pedido cancelado (sin productos cargados)." << endl;
         return;
     }
 
-    // 5. GRABAR PEDIDO
+    // 5. PERSISTENCIA: GRABAR EL PEDIDO EN DISCO
     if (!arcPedido.grabarRegistro(regPedido)){
         cout << "ERROR CRITICO: No se pudo grabar el pedido." << endl;
+        // Si falla grabar el encabezado, debemos deshacer los cambios de stock y borrar los detalles.
         revertirCambiosStock(idNuevoPedido);
         arcDetalle.restaurarCantidadRegistros(cantidadDetallesInicial);
         return;
     }
 
-    // 6. GESTIONAR PAGO
+    // 6. GESTIÓN DEL PAGO
     if (!registrarPagoParaPedido(arcPagos, regPedido)){
         cout << "El pago no se concreto. Se revertira el pedido." << endl;
+        // Si no paga, deshacemos TODO: Stock, Detalles y el Pedido mismo.
         revertirCambiosStock(idNuevoPedido);
         arcDetalle.restaurarCantidadRegistros(cantidadDetallesInicial);
         arcPedido.restaurarCantidadRegistros(cantidadPedidosPrevios);
@@ -143,48 +151,54 @@ void realizarPedido() {
 }
 
 // ==========================================
-// LOGICA DE CARGA DE PRODUCTOS
+// LOGICA DE CARGA DE PRODUCTOS (DETALLES)
 // ==========================================
 bool cargarProductosEnPedido(Pedido &regPedido, int &cantidadDetallesInicial) {
     ArchivoProducto arcProducto("Productos.dat");
     ArchivoDetallePedido arcDetalle("DetallesPedidos.dat");
 
+    // Verificamos si hay mercadería para vender antes de empezar.
     if(!arcProducto.hayProductosConEstadoEliminado(false)){
         cout << "No hay productos activos disponibles." << endl;
         return false;
     }
 
-    bool seAgregoProducto = false;
+    bool seAgregoProducto = false; // Bandera para saber si al menos se cargó un item.
     cout << endl << "-------- AGREGAR PRODUCTOS AL PEDIDO --------" << endl;
 
+    // Bucle para agregar múltiples productos al mismo pedido
     while(true){
         cout << endl << "PRODUCTOS DISPONIBLES: " << endl;
-        arcProducto.listar(); // Podrías implementar una tabla aquí también si lo deseas
+        arcProducto.listar();
 
         cout << endl;
         int idProducto = ingresarEntero("Seleccione ID Producto (0 para terminar): ");
 
+        // Condición de salida del bucle de carga
         if (idProducto == 0){
             if(!seAgregoProducto){
+                // Si intenta salir sin comprar nada, preguntamos si cancela todo.
                 char cancelar;
                 cout << "No cargo productos. Desea cancelar el pedido? (S/N): ";
                 cin >> cancelar;
                 if(cancelar == 'S' || cancelar == 's'){
+                    // Si cancela, borramos cualquier detalle que haya quedado "huerfano" en el archivo.
                     arcDetalle.restaurarCantidadRegistros(cantidadDetallesInicial);
                     return false;
                 }
                 continue;
             }
-            break;
+            break; // Salida exitosa del bucle
         }
 
-        // Validaciones
+        // --- VALIDACIONES DE NEGOCIO ---
         int posProd = arcProducto.buscarRegistro(idProducto);
         if(posProd == -1){
             cout << "ERROR: ID inexistente." << endl; system("pause"); system("cls"); continue;
         }
 
         Producto regProd = arcProducto.leerRegistro(posProd);
+        // Validamos estado lógico (eliminado) y físico (stock)
         if (regProd.getEliminado() || regProd.getStock() <= 0) {
             cout << "ERROR: Producto eliminado o sin stock." << endl; system("pause"); system("cls"); continue;
         }
@@ -196,36 +210,47 @@ bool cargarProductosEnPedido(Pedido &regPedido, int &cantidadDetallesInicial) {
             cout << "ERROR: Cantidad invalida o stock insuficiente." << endl; system("pause"); system("cls"); continue;
         }
 
-        // Logica de Detalle
+        // --- LÓGICA DE DETALLE: ¿NUEVO O EXISTENTE? ---
+        // Verificamos si este producto YA fue agregado en ESTE mismo pedido anteriormente.
+        // Esto evita tener dos líneas iguales (ej: "Café x1" y luego "Café x1").
         int posDetalleExistente = arcDetalle.buscarDetallePorPedidoYProducto(regPedido.getIdPedido(), idProducto);
         float subtotalItem = 0;
 
         if (posDetalleExistente != -1) {
-            // Actualizar existente
+            // CASO 1: El producto ya estaba en el pedido -> ACTUALIZAMOS CANTIDAD
             DetallePedido detalle = arcDetalle.leerRegistro(posDetalleExistente);
             int nuevaCant = detalle.getCantidad() + cantidad;
 
+            // Re-validamos stock con la suma total acumulada
             if (nuevaCant > regProd.getStock()) {
                  cout << "ERROR: La suma total supera el stock disponible." << endl; system("pause"); continue;
             }
 
             detalle.setCantidad(nuevaCant);
+
+            // Sobreescribimos el registro del detalle en el archivo
             if(arcDetalle.modificarRegistro(detalle, posDetalleExistente)){
                 subtotalItem = regProd.getPrecio() * cantidad;
-                regPedido.setSubtotal(regPedido.getSubtotal() + subtotalItem);
-                actualizarStockProducto(idProducto, cantidad, false);
+                regPedido.setSubtotal(regPedido.getSubtotal() + subtotalItem); // Actualizamos el total del pedido padre
+
+                // IMPORTANTE: Descontamos el stock YA MISMO para evitar vender lo que no hay si el bucle sigue.
+                actualizarStockProducto(idProducto, cantidad, false); // false = restar stock
+
                 cout << "Cantidad actualizada." << endl;
                 seAgregoProducto = true;
             }
         } else {
-            // Crear nuevo
+            // CASO 2: Producto nuevo en el pedido -> CREAMOS NUEVO REGISTRO
             int idDetalle = arcDetalle.contarRegistros() + 1;
             DetallePedido nuevoDetalle(idDetalle, regPedido.getIdPedido(), idProducto, cantidad, regProd.getPrecio());
 
+            // Grabamos el nuevo detalle al final del archivo
             if (arcDetalle.grabarRegistro(nuevoDetalle)) {
                 subtotalItem = regProd.getPrecio() * cantidad;
                 regPedido.setSubtotal(regPedido.getSubtotal() + subtotalItem);
-                actualizarStockProducto(idProducto, cantidad, false);
+
+                actualizarStockProducto(idProducto, cantidad, false); // false = restar stock
+
                 cout << "Producto agregado." << endl;
                 seAgregoProducto = true;
             }
@@ -237,7 +262,7 @@ bool cargarProductosEnPedido(Pedido &regPedido, int &cantidadDetallesInicial) {
 }
 
 // ==========================================
-// ANULAR PEDIDO
+// ANULAR PEDIDO (BAJA LÓGICA + DEVOLUCIÓN DE STOCK)
 // ==========================================
 void anularPedido () {
     ArchivoPedido arcPedido("Pedidos.dat");
@@ -247,7 +272,6 @@ void anularPedido () {
         cout << "No hay pedidos activos." << endl; return;
     }
 
-    // Listamos usando la tabla estándar
     listarPedidos();
     cout << endl;
 
@@ -274,9 +298,14 @@ void anularPedido () {
 
     if (conf == 'S' || conf == 's'){
         cout << "Restaurando stock..." << endl;
+
+        // 1. Devolver el stock de todos los productos involucrados en este pedido.
         revertirCambiosStock(idAnular);
 
+        // 2. Marcar el pedido como eliminado (Baja lógica).
         regPedido.setEliminado(true);
+
+        // 3. Guardar el cambio de estado en el archivo.
         if (arcPedido.modificarRegistro(regPedido, pos)){
             cout << "Pedido anulado exitosamente." << endl;
         } else {
@@ -288,29 +317,49 @@ void anularPedido () {
 // ==========================================
 // FUNCIONES AUXILIARES (STOCK & SELECCION)
 // ==========================================
+
+// Función genérica para sumar o restar stock.
+// idProducto: Qué modificamos.
+// cantidad: Cuánto modificamos.
+// devolverStock: true = SUMAR (Anular), false = RESTAR (Vender).
 void actualizarStockProducto(int idProducto, int cantidad, bool devolverStock) {
     ArchivoProducto arc("Productos.dat");
     int pos = arc.buscarRegistro(idProducto);
+
     if (pos != -1) {
         Producto p = arc.leerRegistro(pos);
         int stockActual = p.getStock();
-        if (devolverStock) p.setStock(stockActual + cantidad);
-        else p.setStock(stockActual - cantidad);
+
+        if (devolverStock) {
+            p.setStock(stockActual + cantidad); // Devolución
+        } else {
+            p.setStock(stockActual - cantidad); // Venta
+        }
+
+        // Sobreescribimos el producto actualizado en el archivo
         arc.modificarRegistro(p, pos);
     }
 }
 
+// Recorre TODOS los detalles buscando los que pertenecen a un pedido específico
+// para devolver el stock de cada uno. Esencial para anulaciones.
 void revertirCambiosStock(int idPedido) {
     ArchivoDetallePedido arcDetalle("DetallesPedidos.dat");
     int total = arcDetalle.contarRegistros();
+
+    // Búsqueda secuencial en el archivo de detalles
     for(int i=0; i<total; i++){
         DetallePedido det = arcDetalle.leerRegistro(i);
+
+        // Si el detalle pertenece al pedido que estamos anulando...
         if(det.getIdPedido() == idPedido){
+            // Llamamos a la función de stock con 'true' para devolver esa cantidad.
             actualizarStockProducto(det.getIdProducto(), det.getCantidad(), true);
         }
     }
 }
 
+// Helper para validar existencia y estado de Cliente en una sola llamada.
 int seleccionarClienteValido() {
     ArchivoCliente arc("Clientes.dat");
     if (!arc.hayClientesConEstadoEliminado(false)){
@@ -320,6 +369,8 @@ int seleccionarClienteValido() {
     arc.listar();
     int id = ingresarEntero("Seleccione ID Cliente: ");
     int pos = arc.buscarRegistro(id);
+
+    // Validamos: Que exista (pos != -1) y que NO esté eliminado.
     if (pos != -1 && !arc.leerRegistro(pos).getEliminado()) return id;
 
     cout << "Cliente invalido." << endl; system("pause");
@@ -352,16 +403,21 @@ void listarPedidos() {
     int cant = arcPedido.contarRegistros();
     if(cant == 0){ cout << "Sin registros." << endl; return; }
 
+    // Usamos memoria dinámica (vector) para cargar los pedidos y poder ordenarlos
+    // sin modificar el archivo físico (que tiene orden de carga).
     Pedido *vector = new Pedido[cant];
     int validos = 0;
+
+    // Carga del vector en memoria
     for(int i=0; i<cant; i++){
         Pedido p = arcPedido.leerRegistro(i);
         if(p.getIdPedido() != -1) vector[validos++] = p;
     }
 
+    // Ordenamiento en memoria (Burbujeo por fecha)
     if(validos > 0) ordenarPedidosPorFecha(vector, validos);
 
-    // --- ACTIVOS ---
+    // Muestra Pedidos Activos
     cout << endl << ">>> PEDIDOS ACTIVOS" << endl;
     mostrarEncabezadoTablaPedidos();
     bool hayActivos = false;
@@ -374,7 +430,7 @@ void listarPedidos() {
     if (!hayActivos) cout << "|| (No hay pedidos activos)" << endl;
     lineaDoble(ANCHO_MENU);
 
-    // --- ANULADOS ---
+    // Muestra Pedidos Anulados
     cout << endl << ">>> PEDIDOS ANULADOS" << endl;
     mostrarEncabezadoTablaPedidos();
     bool hayAnulados = false;
@@ -386,6 +442,7 @@ void listarPedidos() {
     }
     if (!hayAnulados) cout << "|| (No hay pedidos anulados)" << endl;
     lineaDoble(ANCHO_MENU);
+
 
     delete[] vector;
 }

@@ -339,7 +339,7 @@ Producto* obtenerProductosActivos(int &cantidad) {
 }
 
 void mostrarEncabezadoProductos() {
-    lineaDoble(80); // Ajustado a 80
+    lineaDoble(80);
     // Llama a la funcion de Tablas.cpp
     imprimirFilaProducto("ID", "NOMBRE", "PRECIO ($)", "STOCK");
     lineaSimple(80); // Ajustado a 80
