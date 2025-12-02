@@ -167,6 +167,4 @@ cout << "---------- FIN DE LISTADO ----------"<<endl<<endl;
 
 fclose(pArchivo);
 
-
-
 }

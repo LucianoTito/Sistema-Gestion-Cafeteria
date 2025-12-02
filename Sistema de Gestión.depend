@@ -408,7 +408,7 @@
 	"../../Headers/Persistence/ArchivoEmpleado.h"
 	"../../Headers/Entities/Empleado.h"
 
-1761847442 source:d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\sistema_de_gestion\sistema de gestión\sources\persistence\archivopagos.cpp
+1764654970 source:d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\sistema_de_gestion\sistema de gestión\sources\persistence\archivopagos.cpp
 	<iostream>
 	<string>
 	<cstdio>
@@ -518,7 +518,7 @@
 
 1764651586 d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\sistema_de_gestion\sistema de gestión\headers\ui\menugestionproductos.h
 
-1764649712 source:d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\sistema_de_gestion\sistema de gestión\sources\ui\menupedidos.cpp
+1764654750 source:d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\sistema_de_gestion\sistema de gestión\sources\ui\menupedidos.cpp
 	<iostream>
 	<cstdlib>
 	<cstdio>
@@ -542,7 +542,7 @@
 
 1763276303 d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\sistema_de_gestion\sistema de gestión\headers\ui\menupedidos.h
 
-1764214321 source:d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\sistema_de_gestion\sistema de gestión\sources\ui\menuprincipal.cpp
+1764656088 source:d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\sistema_de_gestion\sistema de gestión\sources\ui\menuprincipal.cpp
 	<iostream>
 	<cstdlib>
 	"../../Headers/UI/menuPrincipal.h"
@@ -554,6 +554,7 @@
 	"../../Headers/UI/reportes.h"
 	"../../Headers/UI/configuraciones.h"
 	"../../Headers/Utilidades/Validaciones.h"
+	"../../Headers/Utilidades/Tablas.h"
 
 1763266793 d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\sistema_de_gestion\sistema de gestión\headers\ui\menuprincipal.h
 
