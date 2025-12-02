@@ -11,7 +11,6 @@ private:
     Fecha _fecha;
     float _subtotal;
     int _porcentajeDescuento;
-    int _puntuacionServicio;
     bool _eliminado;
 
 public:
@@ -23,27 +22,24 @@ public:
            Fecha fecha = Fecha(),
            float subtotal = 0.0f,
            int porcentajeDesc = 0,
-           int puntuacion = 0,
            bool eliminado = false);
 
     //  Getters
-    int getIdPedido();
-    int getIdCliente();
-    int getIdEmpleado();
-    int getNroMesa();
-    Fecha getFecha();
-    float getSubtotal();
-    int getPorcentajeDescuento();
-    float getTotal();
-    int getPuntuacionServicio();
-    bool getEliminado();
+    int getIdPedido() const;
+    int getIdCliente() const;
+    int getIdEmpleado() const;
+    int getNroMesa() const;
+    Fecha getFecha() const;
+    float getSubtotal() const;
+    int getPorcentajeDescuento() const;
+    float getTotal() const;
+    bool getEliminado() const;
 
     // Setters
     void setNroMesa(int nro, bool mostrarAdvertencia = true);
     void setFecha(Fecha fecha);
     void setSubtotal(float subtotal);
     void setPorcentajeDescuento(int porcentaje);
-    void setPuntuacionServicio(int puntuacion, bool mostrarAdvertencia = true);
     void setEliminado(bool eliminado);
 
     //Métodos

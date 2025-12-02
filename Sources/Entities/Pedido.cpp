@@ -16,7 +16,6 @@ Pedido::Pedido(int idPedido,
                Fecha fecha,
                float subtotal,
                int porcentajeDesc,
-               int puntuacion,
                bool eliminado)
     : _idPedido(idPedido),
       _idCliente(idCliente),
@@ -27,27 +26,25 @@ Pedido::Pedido(int idPedido,
     setNroMesa(nroMesa, false);
     setSubtotal(subtotal);
     setPorcentajeDescuento(porcentajeDesc);
-    setPuntuacionServicio(puntuacion, false);
 }
 
 // Getters
-int Pedido::getIdPedido() { return _idPedido; }
-int Pedido::getIdCliente() { return _idCliente; }
-int Pedido::getIdEmpleado() { return _idEmpleado; }
-int Pedido::getNroMesa() { return _nroMesa; }
-Fecha Pedido::getFecha() { return _fecha; }
-float Pedido::getSubtotal() { return _subtotal; }
-int Pedido::getPorcentajeDescuento() { return _porcentajeDescuento; }
+int Pedido::getIdPedido() const { return _idPedido; }
+int Pedido::getIdCliente() const { return _idCliente; }
+int Pedido::getIdEmpleado() const { return _idEmpleado; }
+int Pedido::getNroMesa() const { return _nroMesa; }
+Fecha Pedido::getFecha() const { return _fecha; }
+float Pedido::getSubtotal() const { return _subtotal; }
+int Pedido::getPorcentajeDescuento() const { return _porcentajeDescuento; }
 
-float Pedido::getTotal() {
+float Pedido::getTotal() const  {
     float factorDescuento = _porcentajeDescuento / 100.0f;
     float montoDescuento = _subtotal * factorDescuento;
     float totalCalculado = _subtotal - montoDescuento;
     return (totalCalculado > 0.0f) ? totalCalculado : 0.0f;
 }
 
-int Pedido::getPuntuacionServicio() { return _puntuacionServicio; }
-bool Pedido::getEliminado() { return _eliminado; }
+bool Pedido::getEliminado() const { return _eliminado; }
 
 // Setters
 void Pedido::setNroMesa(int nro, bool mostrarAdvertencia) {
@@ -82,14 +79,6 @@ void Pedido::setPorcentajeDescuento(int porcentaje) {
     }
 }
 
-void Pedido::setPuntuacionServicio(int puntuacion, bool mostrarAdvertencia) {
-    if (puntuacion >= 1 && puntuacion <= 5) {
-        _puntuacionServicio = puntuacion;
-    } else if (mostrarAdvertencia) {
-        cout << "La puntuacion debe ser un valor entre 1 y 5 inclusive. Se le asignara 3 por defecto." << endl;
-        _puntuacionServicio = 3;
-    }
-}
 
 void Pedido::setEliminado(bool eliminado) {
     _eliminado = eliminado;
@@ -111,7 +100,7 @@ void Pedido::Cargar(int idPedido, int idCliente, int idEmpleado) {
     _fecha.asignarFechaActual();
     cout << "Fecha del pedido establecida automáticamente: ";
     _fecha.Mostrar();
-    int mesa, puntaje, porcDesc;
+    int mesa, porcDesc;
 
 
     //Numero de mesa
@@ -142,17 +131,6 @@ void Pedido::Cargar(int idPedido, int idCliente, int idEmpleado) {
     setPorcentajeDescuento(porcDesc);
 
 
-    //Puntaje del servicio
-    while(true){
-        puntaje = ingresarEntero("Ingrese el puntaje del servicio (1 a 5): ");
-        if (puntaje >= 1 && puntaje <= 5){
-            break;
-        } else {
-        cout<< "ERROR: El puntaje debe ser un numero entre 1 y 5."<<endl;
-        }
-    }
-    setPuntuacionServicio(puntaje);
-
     _eliminado = false;
     cout << "Pedido cargado correctamente." << endl;
 }
@@ -169,6 +147,5 @@ void Pedido::Mostrar() {
     cout << "Subtotal: $" << _subtotal << endl;
     cout << "Descuento Aplicado: " << _porcentajeDescuento << "%" << endl;
     cout << "TOTAL A PAGAR: $" << getTotal() << endl;
-    cout << "Puntuacion del servicio: " << _puntuacionServicio << endl;
     cout << "-------------------------" << endl;
 }

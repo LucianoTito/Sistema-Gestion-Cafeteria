@@ -16,6 +16,8 @@
 #include "../../Headers/Entities/Pagos.h"
 #include "../../Headers/Persistence/ArchivoPagos.h"
 #include "../../Headers/Utilidades/Validaciones.h"
+#include "../../Headers/Utilidades/archivoPago.h"
+
 using namespace std;
 
 //Funciones auxiliares privadas de este módulo
@@ -47,6 +49,7 @@ while (true){
 
     system ("cls");
 
+    bool mostrarPausa = true;
 
     switch (opcion){
 
@@ -61,6 +64,7 @@ case 3:
     break;
 case 4:
      menuConsultasPedidos();
+     mostrarPausa = false; // Evita la pausa doble al volver desde el submenú de consultas
     break;
 case 5:
     anularPedido();
@@ -73,7 +77,10 @@ default:
 
 
     }
-system ("pause");
+if(mostrarPausa){
+    system ("pause");
+}
+
 
 }
 
@@ -135,6 +142,9 @@ if (regCliente.getEliminado()== true){
 
 //Si pasa esos dos if, el cliente es válido.
 
+// Limpio la pantalla para que el listado de empleados quede despejado.
+system("cls");
+
 //Verifico si empleados activos p/ asignar el pedido
 if(!arcEmpleado.hayEmpleadosConEstadoEliminado(false)){
 
@@ -169,6 +179,9 @@ if (regEmpleado.getEliminado()== true){
 
 
 //Si cliente y empleados son válidos se puede seguir
+
+// Limpio la pantalla para comenzar la selección de productos sin información previa en pantalla.
+system("cls");
 
 //CREAR PEDIDO
 //creo obj Pedido vacío
@@ -266,6 +279,9 @@ while(true){
         cout <<endl << "Producto seleccionado: "<< regProducto.getNombre()<<endl;
         cout << "Stock disponible: "<<regProducto.getStock()<<endl;
 
+        // Precio unitario atado al producto (evita ingreso manual)
+        float precioUnitario = regProducto.getPrecio();
+
         //validacion del cin de ingresar entero
         cout <<endl;
         int cantidadPedida = ingresarEntero("Ingrese la cantidad deseada: ");
@@ -311,10 +327,12 @@ if(posicionDetalleExistente != -1){
 
     //Actualización del objeto en memoria
     detalleExistente.setCantidad(cantidadAcumulada);
+    // El precio se mantiene alineado al producto para evitar ingresos manuales.
+    detalleExistente.setPrecioUnitario(regProducto.getPrecio());
 
     //Pre-cálculo del costo de lo que se está intentando agregar ahora
-float precioUnitario = regProducto.getPrecio();
- float calculoSubtotalItem = precioUnitario * cantidadPedida;
+
+float calculoSubtotalItem = precioUnitario * cantidadPedida;
 
 
     // Si falla la escritura
@@ -350,17 +368,12 @@ float precioUnitario = regProducto.getPrecio();
 
         int idDetalleNuevo = arcDetalle.contarRegistros() + 1;
 
-        float precioUnitario = 0.0f;
-        while(true){
-            cout << endl << "Precio sugerido del sistema: $"<<regProducto.getPrecio()<<endl;
-            precioUnitario = ingresarFloat("Ingrese el precio unitario a aplicar: ");
-            if(precioUnitario >= 0){
-                break;
-            }
-            cout << "ERROR: El precio unitario no puede ser negativo."<<endl;
-        }
+        // El precio unitario se toma automáticamente del producto seleccionado.
 
         float calculoSubtotalItem = precioUnitario * cantidadPedida;
+
+
+
 
  //Crear el objeto DetallePedido con los datos validados
         DetallePedido regDetalle(
@@ -432,29 +445,8 @@ if (!exitoPedido){
     return;
 }
 
-//CREAR Y GRABAR EL PAGO
-
-//Creación de obj de Pago
-Pagos regPago;
-
-//Calculo del ID del nvo pago
-int idPagoNuevo = arcPagos.contarRegistros() + 1;
-
-//Obtener el monto total a pagar
-float montoAPagar = regPedido.getTotal();
-
-//Cargar el obj Pago (con validación de coherencia de fechas)
-cout << endl << "----------REGISTRAR PAGO ----------"<<endl;
-regPago.Cargar(idPagoNuevo, regPedido.getIdPedido(), montoAPagar, regPedido.getFecha());
-
-
-
-//Grabo el Pago en el archivo
-bool exitoPago = arcPagos.grabarRegistro(regPago);
-if (!exitoPago){
-
-    cout << "ERROR! El pedido se grabo, pero no se pudo registrar el Pago"<<endl;
-
+//CREAR Y GRABAR EL PAGO DESDE EL NUEVO MÓDULO
+if (!registrarPagoParaPedido(arcPagos, regPedido)){
     arcDetalle.restaurarCantidadRegistros(cantidadDetallesInicial);
     arcPedido.restaurarCantidadRegistros(cantidadPedidosPrevios);
     return;
@@ -896,22 +888,8 @@ if (!detallesEncontrados){
 
 
 cout << "---------- INFORMACION DEL PAGO ----------"<<endl;
-int cantidadPagos = arcPagos.contarRegistros();
-bool pagoEncontrado = false;
 
-for (int i=0; i<cantidadPagos; i++){
-    Pagos regPagoLeido = arcPagos.leerRegistro(i);
-
-    //Busco el pago que coincida con el ID del pedido
-    if (regPagoLeido.getIdPedido() ==idPedidoBuscar){
-        regPagoLeido.Mostrar(); //Mostrar los datos del pago
-        pagoEncontrado = true;
-        break; // Salir del for porque un pedido tiene solo un pago
-    }
-}
-if (!pagoEncontrado){
-    cout << "Este pedido no tiene un pago asociado. "<<endl;
-}
+mostrarPagoDePedido(arcPagos, idPedidoBuscar);
 
 cout << "======================================"<<endl <<endl;
 

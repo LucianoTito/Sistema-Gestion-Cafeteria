@@ -611,7 +611,7 @@ if (pCsv == nullptr){
 }
 
 //Encabezado CSV
-fprintf(pCsv, "ID_Pedido,ID_Cliente,ID_Empleado,Nro_Mesa,Fecha_Dia,Fecha_Mes,Fecha_Anio,Subtotal,Descuento,Puntuacion,Eliminado\n");
+fprintf(pCsv, "ID_Pedido,ID_Cliente,ID_Empleado,Nro_Mesa,Fecha_Dia,Fecha_Mes,Fecha_Anio,Subtotal,Descuento,Eliminado\n");
 
 Pedido reg;
 int contador = 0;
@@ -621,7 +621,7 @@ while (fread(&reg, sizeof(Pedido), 1, pDat) == 1){
 
     Fecha f = reg.getFecha();
 
-    fprintf(pCsv, "%d,%d,%d,%d,%d,%d,%d,%.2f,%d,%d,%d\n",
+    fprintf(pCsv, "%d,%d,%d,%d,%d,%d,%d,%.2f,%d,%d\n",
                 reg.getIdPedido(),
                 reg.getIdCliente(),
                 reg.getIdEmpleado(),
@@ -631,7 +631,6 @@ while (fread(&reg, sizeof(Pedido), 1, pDat) == 1){
                 f.getAnio(),
                 reg.getSubtotal(),
                 reg.getPorcentajeDescuento(),
-                reg.getPuntuacionServicio(),
                 reg.getEliminado());
 
 

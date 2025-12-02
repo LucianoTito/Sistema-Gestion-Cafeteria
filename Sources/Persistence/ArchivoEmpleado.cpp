@@ -15,7 +15,7 @@ void mostrarEncabezadoTablaEmpleados(bool incluirEstado){
          << setw(15) << "Nombre"
          << setw(15) << "Apellido"
          << setw(18) << "Telefono"
-         << setw(25) << "Mail"
+         << setw(45) << "Mail"
          << setw(15) << "Puesto";
 
     if(incluirEstado){
@@ -24,7 +24,7 @@ void mostrarEncabezadoTablaEmpleados(bool incluirEstado){
 
     cout << endl;
     // Línea divisoria acorde a la cantidad de columnas.
-    cout << string(incluirEstado ? 97 : 89, '-') << endl;
+    cout << string(incluirEstado ? 112 : 104, '-') << endl;
 }
 
 

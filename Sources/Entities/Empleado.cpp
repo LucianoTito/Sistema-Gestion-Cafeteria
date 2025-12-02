@@ -72,7 +72,7 @@ void Empleado::MostrarFila(const char* estado){
          << setw(15) << _nombre
          << setw(15) << _apellido
          << setw(18) << _telefono
-         << setw(25) << _mail
+         << setw(45) << _mail
          << setw(15) << _puesto;
 
     // El estado es opcional y se muestra cuando se requiere distinguir activos/inactivos.
