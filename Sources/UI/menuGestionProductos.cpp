@@ -32,11 +32,9 @@ void ordenarProductosPorPrecio(Producto registros[], int cantidad);
 void menuProductos() {
     int opcion;
     while (true) {
-        system("cls");
-        // Ajustado a 80 para que coincida con el nuevo ancho de tabla
-        lineaDoble(80);
-        cout << "                GESTION DE PRODUCTOS" << endl;
-        lineaDoble(80);
+        limpiarConsola();
+        imprimirTituloDecorado("GESTION DE PRODUCTOS", 80);
+        rlutil::setColor(PaletaCafe::CREMA);
         cout << "1. AGREGAR PRODUCTO" << endl;
         cout << "2. LISTAR PRODUCTOS (ACTIVOS)" << endl;
         cout << "3. LISTAR PRODUCTOS DADOS DE BAJA" << endl;
@@ -47,12 +45,16 @@ void menuProductos() {
         cout << "8. LISTAR ORDENADOS POR PRECIO" << endl;
         cout << "9. CONSULTAR PRODUCTO POR ID" << endl;
         cout << "10. CONSULTAR PRODUCTOS CON STOCK BAJO" << endl;
+        rlutil::setColor(PaletaCafe::BASE);
         lineaSimple(80);
+        rlutil::setColor(PaletaCafe::ESPUMA);
         cout << "0. VOLVER AL MENU PRINCIPAL" << endl;
+        rlutil::setColor(PaletaCafe::BASE);
         lineaDoble(80);
+        restaurarColor();
 
         opcion = ingresarEntero("SELECCIONE UNA OPCION: ");
-        system("cls");
+        limpiarConsola();
 
         switch (opcion) {
             case 1: agregarProducto(); break;
@@ -66,9 +68,10 @@ void menuProductos() {
             case 9: consultarProductoPorID(); break;
             case 10: consultarProductosConStockBajo(); break;
             case 0: return;
-            default: cout << "Opcion incorrecta." << endl; break;
+            default: imprimirMensajeError("Opcion incorrecta.");
+            break;
         }
-        system("pause");
+        pausarConsola();
     }
 }
 

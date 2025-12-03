@@ -37,21 +37,24 @@ Cliente* obtenerClientesActivos(int &cantidad); // Retorna array dinámico
 void menuClientes(){
     int opcion;
     while(true){
-        system ("cls");
-        lineaDoble(94);
-        cout << "                           GESTION DE CLIENTES" << endl;
-        lineaDoble(94);
+        limpiarConsola();
+        imprimirTituloDecorado("GESTION DE CLIENTES", 94);
+        rlutil::setColor(PaletaCafe::CREMA);
         cout << "1. AGREGAR CLIENTE" << endl;
         cout << "2. LISTADOS Y REPORTES" << endl;
         cout << "3. MODIFICAR CLIENTE" << endl;
         cout << "4. ELIMINAR CLIENTE (BAJA)" << endl;
         cout << "5. RECUPERAR CLIENTE (ALTA)" << endl;
+        rlutil::setColor(PaletaCafe::BASE);
         lineaSimple(94);
+        rlutil::setColor(PaletaCafe::ESPUMA);
         cout << "0. VOLVER AL MENU PRINCIPAL" << endl;
+        rlutil::setColor(PaletaCafe::BASE);
         lineaDoble(94);
+        restaurarColor();
 
         opcion = ingresarEntero("SELECCIONE UNA OPCION: ");
-        system("cls");
+        limpiarConsola();
 
         // Control de pausa para evitar dobles 'enter' al volver de submenús
         bool pausar = true;
@@ -66,9 +69,9 @@ void menuClientes(){
             case 4: bajaCliente(); break;
             case 5: altaCliente(); break;
             case 0: return;
-            default: cout << "Opcion incorrecta." << endl; break;
+            default: imprimirMensajeError("Opcion incorrecta."); break;
         }
-        if(pausar) system("pause");
+        if(pausar) pausarConsola();
     }
 }
 
@@ -152,8 +155,22 @@ void bajaCliente(){
 
     if (conf == 'S' || conf == 's'){
         reg.setEliminado(true);
-        if(arcCliente.modificarRegistro(reg, pos)) cout << "Cliente dado de baja." << endl;
-        else cout << "ERROR al eliminar." << endl;
+        if(arcCliente.modificarRegistro(reg, pos)) {
+            rlutil::setColor(PaletaCafe::BASE);
+            lineaSimple(94);
+            rlutil::setColor(PaletaCafe::CREMA);
+
+            cout << "CLIENTE DADO DE BAJA EXITOSAMENTE" << endl;
+
+            rlutil::setColor(PaletaCafe::BASE);
+            lineaSimple(94);
+             pausarConsola();
+
+
+            restaurarColor();
+
+        }
+        else imprimirMensajeError("ERROR al eliminar.");
     }
 }
 
@@ -175,8 +192,17 @@ void altaCliente(){
 
     if (conf == 'S' || conf == 's'){
         reg.setEliminado(false);
-        if(arcCliente.modificarRegistro(reg, pos)) cout << "Cliente recuperado." << endl;
-        else cout << "ERROR al recuperar." << endl;
+                if(arcCliente.modificarRegistro(reg, pos)) {
+            rlutil::setColor(PaletaCafe::BASE);
+            lineaSimple(94);
+            rlutil::setColor(PaletaCafe::CREMA);
+            cout << "CLIENTE DADO DE ALTA EXITOSAMENTE" << endl;
+            rlutil::setColor(PaletaCafe::BASE);
+            lineaSimple(94);
+            pausarConsola();
+            restaurarColor();
+        }
+        else imprimirMensajeError("ERROR al recuperar.");
     }
 }
 
@@ -186,21 +212,23 @@ void altaCliente(){
 
 void listarClientesSubmenu(){
     while(true){
-        system("cls");
-        lineaDoble(94);
-        cout << "              REPORTES DE CLIENTES" << endl;
-        lineaDoble(94);
+        limpiarConsola();
+        imprimirTituloDecorado("REPORTES DE CLIENTES", 94);
+        rlutil::setColor(PaletaCafe::CREMA);
         cout << "1. TODOS LOS ACTIVOS" << endl;
         cout << "2. TODOS LOS ELIMINADOS" << endl;
         cout << "3. ORDENADOS POR APELLIDO" << endl;
         cout << "4. RANKING POR CANTIDAD DE PEDIDOS" << endl;
         cout << "5. CLIENTES QUE SUPERAN UN MONTO DE COMPRA" << endl;
+        rlutil::setColor(PaletaCafe::BASE);
         lineaSimple(94);
+        rlutil::setColor(PaletaCafe::ESPUMA);
         cout << "0. VOLVER" << endl;
+        rlutil::setColor(PaletaCafe::BASE);
         lineaDoble(94);
-
+        restaurarColor();
         int opc = ingresarEntero("OPCION: ");
-        system("cls");
+        limpiarConsola();
 
         switch(opc){
             case 1: listarClientesGenerico(false); break;
@@ -209,9 +237,9 @@ void listarClientesSubmenu(){
             case 4: listarClientesConMasPedidos(); break;
             case 5: listarClientesPorMontoGastado(); break;
             case 0: return;
-            default: cout << "Incorrecto." << endl; break;
+            default: imprimirMensajeError("Incorrecto."); break;
         }
-        system("pause");
+        pausarConsola();
     }
 }
 

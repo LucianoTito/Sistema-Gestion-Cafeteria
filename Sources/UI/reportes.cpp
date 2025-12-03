@@ -42,21 +42,24 @@ void ordenarRankingEmpleados(Empleado* emps, int* cants, int n);
 void menuReportes(){
     int opcion;
     while(true){
-        system("cls");
-        lineaDoble(60);
-        cout << "               MENU DE REPORTES Y ESTADISTICAS" << endl;
-        lineaDoble(60);
+        limpiarConsola();
+        imprimirTituloDecorado("MENU DE REPORTES Y ESTADISTICAS", 60);
+        rlutil::setColor(PaletaCafe::CREMA);
         cout << "1. RECAUDACION MENSUAL (Por Anio)" << endl;
         cout << "2. RANKING PRODUCTOS MAS VENDIDOS (Historico)" << endl;
         cout << "3. DESEMPENIO DE EMPLEADOS (Cantidad de Pedidos)" << endl;
         cout << "4. PRODUCTOS VENDIDOS POR PERIODO (Fechas)" << endl;
         cout << "5. PAGOS" << endl;
+        rlutil::setColor(PaletaCafe::BASE);
         lineaSimple(60);
+        rlutil::setColor(PaletaCafe::ESPUMA);
         cout << "0. VOLVER AL MENU PRINCIPAL" << endl;
+        rlutil::setColor(PaletaCafe::BASE);
         lineaDoble(60);
+        restaurarColor();
 
         opcion = ingresarEntero("SELECCIONE UNA OPCION: ");
-        system("cls");
+        limpiarConsola();
 
         switch(opcion){
             case 1: reporteRecaudacionAnualMensual(); break;
@@ -65,9 +68,10 @@ void menuReportes(){
             case 4: reporteProductosPorPeriodo(); break;
             case 5: menuReportesPagos(); break;
             case 0: return;
-            default: cout << "Opcion incorrecta." << endl; break;
+            default: imprimirMensajeError("Opcion incorrecta.");
+            break;
         }
-        system("pause");
+        pausarConsola();
     }
 }
 
@@ -331,28 +335,32 @@ void reporteProductosPorPeriodo(){
 void menuReportesPagos(){
     int opcion;
     while(true){
-        system("cls");
-        lineaDoble(60);
-        cout << "                   REPORTES DE PAGOS" << endl;
-        lineaDoble(60);
+        limpiarConsola();
+        imprimirTituloDecorado("REPORTES DE PAGOS", 60);
+        rlutil::setColor(PaletaCafe::CREMA);
         cout << "1. PAGOS POR PERIODO" << endl;
         cout << "2. PAGOS POR METODO" << endl;
         cout << "3. PAGOS POR PEDIDO" << endl;
+        rlutil::setColor(PaletaCafe::BASE);
         lineaSimple(60);
+        rlutil::setColor(PaletaCafe::ESPUMA);
         cout << "0. VOLVER" << endl;
+        rlutil::setColor(PaletaCafe::BASE);
         lineaDoble(60);
+        restaurarColor();
+
 
         opcion = ingresarEntero("SELECCIONE UNA OPCION: ");
-        system("cls");
+        limpiarConsola();
 
         switch(opcion){
             case 1: reportePagosPorPeriodo(); break;
             case 2: reportePagosPorMetodo(); break;
             case 3: reportePagosPorPedido(); break;
             case 0: return;
-            default: cout << "Opcion incorrecta." << endl; break;
+            default: imprimirMensajeError("Opcion incorrecta."); break;
         }
-        system("pause");
+        pausarConsola();
     }
 }
 

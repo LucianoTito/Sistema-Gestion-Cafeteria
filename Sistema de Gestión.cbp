@@ -61,6 +61,7 @@
 		<Unit filename="Headers/Utilidades/Tablas.h" />
 		<Unit filename="Headers/Utilidades/Validaciones.h" />
 		<Unit filename="Headers/Utilidades/archivoPago.h" />
+		<Unit filename="Headers/Utilidades/rlutil.h" />
 		<Unit filename="Sources/Entities/Cliente.cpp" />
 		<Unit filename="Sources/Entities/DetallePedido.cpp" />
 		<Unit filename="Sources/Entities/Empleado.cpp" />

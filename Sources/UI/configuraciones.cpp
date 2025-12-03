@@ -18,26 +18,30 @@ void procesarExportacion(bool exito, const char* nombreArchivo);
 void menuConfiguraciones() {
     int opcion;
     while(true){
-        system("cls");
-        lineaDoble(50);
-        cout << "            CONFIGURACIONES DEL SISTEMA" << endl;
-        lineaDoble(50);
+        limpiarConsola();
+        imprimirTituloDecorado("CONFIGURACIONES DEL SISTEMA", 50);
+        rlutil::setColor(PaletaCafe::CREMA);
+
         cout << "1. REALIZAR COPIA DE SEGURIDAD (.BKP)" << endl;
         cout << "2. RESTAURAR COPIA DE SEGURIDAD (.BKP)" << endl;
         cout << "3. EXPORTAR DATOS A EXCEL (CSV)" << endl;
+        rlutil::setColor(PaletaCafe::BASE);
         lineaSimple(50);
+        rlutil::setColor(PaletaCafe::ESPUMA);
         cout << "0. VOLVER AL MENU PRINCIPAL" << endl;
+        rlutil::setColor(PaletaCafe::BASE);
         lineaDoble(50);
+        restaurarColor();
 
         opcion = ingresarEntero("SELECCIONE UNA OPCION: ");
-        system("cls");
+        limpiarConsola();
 
         switch(opcion){
-            case 1: backupMenu(); break;            // Submenu de respaldos
-            case 2: restaurarCopiaSeguridad(); break; // Submenu de restauracion
-            case 3: exportarDatosCSV(); break;      // Submenu de exportacion
+            case 1: backupMenu(); break;
+            case 2: restaurarCopiaSeguridad(); break;
+            case 3: exportarDatosCSV(); break;
             case 0: return;
-            default: cout << "Opcion incorrecta." << endl; break;
+            default: imprimirMensajeError("Opcion incorrecta."); break;
         }
         system("pause");
     }
@@ -46,8 +50,9 @@ void menuConfiguraciones() {
 // Submenu para crear backups
 void backupMenu() {
     while (true) {
-        system("cls");
-        cout << "------- CREAR COPIAS DE SEGURIDAD -------" << endl;
+        limpiarConsola();
+        imprimirTituloDecorado("CREAR COPIAS DE SEGURIDAD", 60);
+        rlutil::setColor(PaletaCafe::CREMA);
         cout << "1. Clientes" << endl;
         cout << "2. Productos" << endl;
         cout << "3. Empleados" << endl;
@@ -56,7 +61,9 @@ void backupMenu() {
         cout << "6. Pagos" << endl;
         cout << "7. RESPALDAR TODO" << endl;
         cout << "0. Volver" << endl;
-        cout << "-----------------------------------------" << endl;
+        rlutil::setColor(PaletaCafe::BASE);
+        lineaSimple(60);
+        restaurarColor();
 
         int opc = ingresarEntero("Opcion: ");
         if (opc == 0) return;
@@ -77,20 +84,21 @@ void backupMenu() {
                 realizarBackupArchivo("Pedidos.dat", "Pedidos.bkp");
                 realizarBackupArchivo("DetallesPedidos.dat", "DetallesPedidos.bkp");
                 realizarBackupArchivo("Pagos.dat", "Pagos.bkp");
-                cout << endl << ">>> BACKUP COMPLETO FINALIZADO." << endl;
+                imprimirMensajeOk(">>> BACKUP COMPLETO FINALIZADO.");
                 break;
-            default: cout << "Opcion invalida." << endl; break;
+            default: imprimirMensajeError("Opcion invalida."); break;
         }
-        system("pause");
+        pausarConsola();
     }
 }
 
 // Submenu para restaurar datos (Sobreescribe archivos .dat)
 void restaurarCopiaSeguridad(){
     while(true) {
-        system("cls");
-        cout << "------- RESTAURAR DESDE BACKUP -------" << endl;
-        // ... (opciones de menu identicas al backup) ...
+        limpiarConsola();
+        imprimirTituloDecorado("RESTAURAR DESDE BACKUP", 60);
+        rlutil::setColor(PaletaCafe::CREMA);
+
         cout << "1. Clientes" << endl;
         cout << "2. Productos" << endl;
         cout << "3. Empleados" << endl;
@@ -99,14 +107,16 @@ void restaurarCopiaSeguridad(){
         cout << "6. Pagos" << endl;
         cout << "7. RESTAURAR TODO" << endl;
         cout << "0. Volver" << endl;
-        cout << "--------------------------------------" << endl;
+        rlutil::setColor(PaletaCafe::BASE);
+        lineaSimple(60);
+        restaurarColor();
 
         int opc = ingresarEntero("Opcion: ");
         if(opc == 0) return;
 
-        // Advertencia de seguridad antes de sobreescribir datos
         char conf;
-        cout << "CUIDADO: Esto sobreescribira los datos actuales con la copia. Continuar? (S/N): ";
+        imprimirMensajeAdvertencia("CUIDADO: Esto sobreescribira los datos actuales con la copia.");
+        imprimirPrompt("Continuar? (S/N): ");
         cin >> conf;
         if(conf != 'S' && conf != 's') continue;
 
@@ -125,19 +135,21 @@ void restaurarCopiaSeguridad(){
                 restaurarBackupArchivo("Pedidos.bkp", "Pedidos.dat");
                 restaurarBackupArchivo("DetallesPedidos.bkp", "DetallesPedidos.dat");
                 restaurarBackupArchivo("Pagos.bkp", "Pagos.dat");
-                cout << endl << ">>> RESTAURACION COMPLETA FINALIZADA." << endl;
+                imprimirMensajeOk(">>> RESTAURACION COMPLETA FINALIZADA.");
                 break;
-            default: cout << "Opcion invalida." << endl; break;
+                default: imprimirMensajeError("Opcion invalida."); break;
+
         }
-        system("pause");
+        pausarConsola();
     }
 }
 
 // Submenu para exportar a CSV
 void exportarDatosCSV(){
     while(true) {
-        system("cls");
-        cout << "------- EXPORTAR A CSV (EXCEL) -------" << endl;
+        limpiarConsola();
+        imprimirTituloDecorado("EXPORTAR A CSV (EXCEL)", 55);
+        rlutil::setColor(PaletaCafe::CREMA);
         cout << "1. Clientes" << endl;
         cout << "2. Productos" << endl;
         cout << "3. Empleados" << endl;
@@ -146,7 +158,9 @@ void exportarDatosCSV(){
         cout << "6. Pagos" << endl;
         cout << "7. EXPORTAR TODO" << endl;
         cout << "0. Volver" << endl;
-        cout << "--------------------------------------" << endl;
+        rlutil::setColor(PaletaCafe::BASE);
+        lineaSimple(55);
+        restaurarColor();
 
         int opc = ingresarEntero("Opcion: ");
         if(opc == 0) return;
@@ -166,11 +180,11 @@ void exportarDatosCSV(){
                 procesarExportacion(exportarPedidosCSV("Pedidos.csv"), "Pedidos");
                 procesarExportacion(exportarDetallesCSV("Detalles.csv"), "Detalles");
                 procesarExportacion(exportarPagosCSV("Pagos.csv"), "Pagos");
-                cout << endl << ">>> EXPORTACION MASIVA COMPLETADA." << endl;
+                imprimirMensajeOk(">>> EXPORTACION MASIVA COMPLETADA.");
                 break;
-            default: cout << "Incorrecto." << endl; break;
+            default: imprimirMensajeError("Incorrecto."); break;
         }
-        system("pause");
+        pausarConsola();
     }
 }
 
@@ -181,28 +195,32 @@ void exportarDatosCSV(){
 void realizarBackupArchivo(const char* nombreReal, const char* nombreBkp) {
     if (existeArchivo(nombreReal)) {
         if (copiarArchivoBinario(nombreReal, nombreBkp)) {
-            cout << "[OK] Backup creado: " << nombreBkp << endl;
+            imprimirMensajeOk(string("Backup creado: ") + nombreBkp);
         } else {
-            cout << "[ERROR] Fallo al crear backup de " << nombreReal << endl;
+            imprimirMensajeError(string("Fallo al crear backup de ") + nombreReal);
         }
     } else {
-        cout << "[AVISO] Archivo no existe: " << nombreReal << " (omitido)" << endl;
+        imprimirMensajeAdvertencia(string("Archivo no existe: ") + nombreReal + " (omitido)");
     }
 }
+
 
 void restaurarBackupArchivo(const char* nombreBkp, const char* nombreReal) {
     if (existeArchivo(nombreBkp)) {
         if (copiarArchivoBinario(nombreBkp, nombreReal)) {
-            cout << "[OK] Restaurado: " << nombreReal << endl;
+
+            imprimirMensajeOk(string("Restaurado: ") + nombreReal);
         } else {
-            cout << "[ERROR] Fallo al restaurar " << nombreReal << endl;
+
+            imprimirMensajeError(string("Fallo al restaurar ") + nombreReal);
         }
     } else {
-        cout << "[ERROR] No existe el backup: " << nombreBkp << endl;
+
+        imprimirMensajeError(string("No existe el backup: ") + nombreBkp);
     }
 }
 
 void procesarExportacion(bool exito, const char* nombreArchivo) {
-    if (exito) cout << "[OK] Exportado: " << nombreArchivo << endl;
-    else cout << "[ERROR] Fallo exportacion de " << nombreArchivo << endl;
+    if (exito) imprimirMensajeOk(string("Exportado: ") + nombreArchivo);
+    else imprimirMensajeError(string("Fallo exportacion de ") + nombreArchivo);
 }

@@ -24,7 +24,7 @@
 using namespace std;
 
 // Constante para mantener la coherencia visual en todo el menú.
-const int ANCHO_MENU = 74;
+const int ANCHO_MENU = 80;
 
 // ==========================================
 // PROTOTIPOS DE FUNCIONES AUXILIARES
@@ -52,21 +52,25 @@ void menuPedidos(){
     int opcion;
 
     while (true){
-        system ("cls");
-        lineaDoble(ANCHO_MENU);
-        cout << "                          GESTION DE PEDIDOS" << endl;
-        lineaDoble(ANCHO_MENU);
-        cout << "1. REALIZAR UN PEDIDO " << endl;
+        limpiarConsola();
+        imprimirTituloDecorado("GESTION DE PEDIDOS", ANCHO_MENU);
+        rlutil::setColor(PaletaCafe::CREMA);
+        cout << "1. REALIZAR UN PEDIDO" << endl;
         cout << "2. VER DETALLE DE UN PEDIDO" << endl;
         cout << "3. LISTAR PEDIDOS (ORDENADOS POR FECHA)" << endl;
         cout << "4. CONSULTAS DE PEDIDOS" << endl;
         cout << "5. ANULAR UN PEDIDO (BAJA LOGICA)" << endl;
+        rlutil::setColor(PaletaCafe::BASE);
         lineaSimple(ANCHO_MENU);
+        rlutil::setColor(PaletaCafe::ESPUMA);
         cout << "0. VOLVER AL MENU PRINCIPAL" << endl;
+        rlutil::setColor(PaletaCafe::BASE);
         lineaDoble(ANCHO_MENU);
+        restaurarColor();
 
         opcion = ingresarEntero("SELECCIONE UNA OPCION: ");
-        system ("cls");
+        limpiarConsola();
+
         bool mostrarPausa = true;
 
         switch (opcion){
@@ -79,9 +83,9 @@ void menuPedidos(){
                 break;
             case 5: anularPedido(); break;
             case 0: return; // Rompe el while(true) y vuelve al main.
-            default: cout << "Opcion incorrecta." << endl; break;
+            default: imprimirMensajeError("Opcion incorrecta."); break;
         }
-        if(mostrarPausa) system ("pause");
+         if(mostrarPausa) pausarConsola();
     }
 }
 
@@ -107,13 +111,13 @@ void realizarPedido() {
     int idCliente = seleccionarClienteValido();
     if (idCliente == -1) return; // Si retorna -1, el usuario canceló o hubo error.
 
-    system("cls");
+    limpiarConsola();
 
     // 2. VALIDACIÓN DE EMPLEADO
     int idEmpleado = seleccionarEmpleadoValido();
     if (idEmpleado == -1) return;
 
-    system("cls");
+    limpiarConsola();
 
     // 3. CREACIÓN DEL ENCABEZADO DEL PEDIDO (EN MEMORIA)
     Pedido regPedido;
@@ -194,20 +198,20 @@ bool cargarProductosEnPedido(Pedido &regPedido, int &cantidadDetallesInicial) {
         // --- VALIDACIONES DE NEGOCIO ---
         int posProd = arcProducto.buscarRegistro(idProducto);
         if(posProd == -1){
-            cout << "ERROR: ID inexistente." << endl; system("pause"); system("cls"); continue;
+            imprimirMensajeError("ID inexistente."); pausarConsola(); limpiarConsola(); continue;
         }
 
         Producto regProd = arcProducto.leerRegistro(posProd);
         // Validamos estado lógico (eliminado) y físico (stock)
         if (regProd.getEliminado() || regProd.getStock() <= 0) {
-            cout << "ERROR: Producto eliminado o sin stock." << endl; system("pause"); system("cls"); continue;
+             imprimirMensajeError("Producto eliminado o sin stock."); pausarConsola(); limpiarConsola(); continue;
         }
 
         cout << "Seleccionado: " << regProd.getNombre() << " | Stock: " << regProd.getStock() << endl;
         int cantidad = ingresarEntero("Ingrese cantidad: ");
 
         if (cantidad <= 0 || cantidad > regProd.getStock()){
-            cout << "ERROR: Cantidad invalida o stock insuficiente." << endl; system("pause"); system("cls"); continue;
+           imprimirMensajeError("Cantidad invalida o stock insuficiente."); pausarConsola(); limpiarConsola(); continue;
         }
 
         // --- LÓGICA DE DETALLE: ¿NUEVO O EXISTENTE? ---
@@ -223,7 +227,8 @@ bool cargarProductosEnPedido(Pedido &regPedido, int &cantidadDetallesInicial) {
 
             // Re-validamos stock con la suma total acumulada
             if (nuevaCant > regProd.getStock()) {
-                 cout << "ERROR: La suma total supera el stock disponible." << endl; system("pause"); continue;
+                 imprimirMensajeError("La suma total supera el stock disponible."); pausarConsola();
+                 continue;
             }
 
             detalle.setCantidad(nuevaCant);
@@ -255,8 +260,8 @@ bool cargarProductosEnPedido(Pedido &regPedido, int &cantidadDetallesInicial) {
                 seAgregoProducto = true;
             }
         }
-        system("pause");
-        system("cls");
+        pausarConsola();
+        limpiarConsola();
     }
     return seAgregoProducto;
 }
@@ -373,7 +378,7 @@ int seleccionarClienteValido() {
     // Validamos: Que exista (pos != -1) y que NO esté eliminado.
     if (pos != -1 && !arc.leerRegistro(pos).getEliminado()) return id;
 
-    cout << "Cliente invalido." << endl; system("pause");
+    imprimirMensajeError("Cliente invalido."); pausarConsola();
     return -1;
 }
 
@@ -388,7 +393,7 @@ int seleccionarEmpleadoValido() {
     int pos = arc.buscarRegistro(id);
     if (pos != -1 && !arc.leerRegistro(pos).getEliminado()) return id;
 
-    cout << "Empleado invalido." << endl; system("pause");
+    imprimirMensajeError("Empleado invalido."); pausarConsola();
     return -1;
 }
 
@@ -450,27 +455,32 @@ void listarPedidos() {
 void menuConsultasPedidos(){
     int opcion;
     while(true){
-        system("cls");
-        lineaDoble(ANCHO_MENU);
-        cout << "                          CONSULTAS DE PEDIDOS" << endl;
-        lineaDoble(ANCHO_MENU);
+        limpiarConsola();
+        imprimirTituloDecorado("CONSULTAS DE PEDIDOS", ANCHO_MENU);
+        rlutil::setColor(PaletaCafe::CREMA);
         cout << "1. POR RANGO DE FECHAS" << endl;
         cout << "2. POR CLIENTE" << endl;
         cout << "3. POR EMPLEADO" << endl;
+        rlutil::setColor(PaletaCafe::BASE);
         lineaSimple(ANCHO_MENU);
+        rlutil::setColor(PaletaCafe::ESPUMA);
         cout << "0. VOLVER" << endl;
+        rlutil::setColor(PaletaCafe::BASE);
         lineaDoble(ANCHO_MENU);
+        restaurarColor();
+
 
         opcion = ingresarEntero("OPCION: ");
-        system("cls");
+        limpiarConsola();
         switch(opcion){
             case 1: consultaPedidosPorRangoFechas(); break;
             case 2: consultaPedidosPorCliente(); break;
             case 3: consultaPedidosPorEmpleado(); break;
             case 0: return;
-            default: cout << "Incorrecto." << endl; break;
+            default: imprimirMensajeError("Incorrecto.");
+            break;
         }
-        system("pause");
+        pausarConsola();
     }
 }
 

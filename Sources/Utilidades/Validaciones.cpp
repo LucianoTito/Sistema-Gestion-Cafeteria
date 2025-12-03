@@ -1,5 +1,6 @@
 #include <iostream>
 #include "../../Headers/Utilidades/Validaciones.h"
+#include "../../Headers/Utilidades/Tablas.h"
 
 using namespace std;
 
@@ -10,14 +11,14 @@ int ingresarEntero(string mensaje) {
 
     while (true) {
 
-        cout << mensaje;
+        imprimirPrompt(mensaje);
         cin >> dato;
 
         if (cin.fail()) {
 
             cin.clear();              // Apaga el estado de error
             cin.ignore(1000, '\n');   // Limpio lo que quedó en el buffer
-            cout << "ERROR: Debe ingresar un numero entero." << endl;
+            imprimirMensajeError("Debe ingresar un numero entero.");
             continue;
 
         } else {
@@ -25,7 +26,7 @@ int ingresarEntero(string mensaje) {
             cin.ignore(100, '\n');   // Limpio caracteres sobrantes
 
             if (dato < 0) {
-                cout << "ERROR: El numero no puede ser negativo." << endl;
+                imprimirMensajeAdvertencia("El numero no puede ser negativo.");
                 continue;
             } else {
                 return dato;
@@ -42,21 +43,21 @@ float ingresarFloat(string mensaje) {
 
     while (true) {
 
-        cout << mensaje;
+        imprimirPrompt(mensaje);
         cin >> dato;
 
         if (cin.fail()) {
 
             cin.clear();
             cin.ignore(100, '\n');
-            cout << "ERROR: Debe ingresar un numero decimal valido." << endl;
+            imprimirMensajeError("Debe ingresar un numero decimal valido.");
 
         } else {
 
             cin.ignore(100, '\n');
 
             if (dato < 0) {
-                cout << "ERROR: El valor no puede ser negativo." << endl;
+                imprimirMensajeAdvertencia("El valor no puede ser negativo.");
             } else {
                 return dato;
             }
@@ -89,10 +90,10 @@ void cargarCadenaObligatoria(const string& mensaje,
                              int tamano){
 
                              do {
-                                cout <<mensaje;
+                                imprimirPrompt(mensaje);
                                 cargarCadena(destino, tamano);
                                 if(destino[0] == '\0'){
-                                    cout <<mensajeError<<endl;
+                                    imprimirMensajeError(mensajeError);
                                 }
                              } while(destino[0] == '\0');
 

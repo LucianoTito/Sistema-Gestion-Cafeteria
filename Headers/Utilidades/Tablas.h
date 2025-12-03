@@ -1,8 +1,32 @@
 #pragma once
 #include <iomanip>
 #include <iostream>
+#include <string>
+#include "rlutil.h"
 
 using namespace std;
+
+namespace PaletaCafe {
+    constexpr int BASE = rlutil::BROWN;
+    constexpr int CREMA = rlutil::YELLOW;
+    constexpr int ESPUMA = rlutil::WHITE;
+    constexpr int HUMO = rlutil::GREY;
+    constexpr int OK = rlutil::LIGHTGREEN;      // Verde: todo ok
+    constexpr int ERROR = rlutil::LIGHTRED;     // Rojo: algo mal
+    constexpr int ADVERTENCIA = rlutil::YELLOW; // Amarillo: cuidado
+}
+
+// Helpers de estilo
+void restaurarColor();
+void limpiarConsola();
+void pausarConsola(const string& mensaje = "Presione cualquier tecla para continuar...");
+void imprimirTituloDecorado(const string& titulo, int ancho = 80);
+void imprimirSubtituloDecorado(const string& subtitulo, int ancho = 80);
+void imprimirMensajeOk(const string& mensaje);
+void imprimirMensajeAdvertencia(const string& mensaje);
+void imprimirMensajeError(const string& mensaje);
+void imprimirPrompt(const string& prompt);
+void imprimirBannerCafe();
 
 // Funciones generales de linea
 void lineaDoble(int n = 80); // Valor por defecto para facilitar uso

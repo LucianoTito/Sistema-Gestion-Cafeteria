@@ -31,10 +31,9 @@ int buscarEmpleadoID(ArchivoEmpleado& arc, bool permitirEliminados);
 void menuEmpleados() {
     int opcion;
     while (true) {
-        system("cls");
-        lineaDoble(100);
-        cout << "                                  GESTION DE EMPLEADOS" << endl;
-        lineaDoble(100);
+        limpiarConsola();
+        imprimirTituloDecorado("GESTION DE EMPLEADOS", 100);
+        rlutil::setColor(PaletaCafe::CREMA);
         cout << "1. AGREGAR EMPLEADO" << endl;
         cout << "2. LISTAR EMPLEADOS ACTIVOS" << endl;
         cout << "3. LISTAR EMPLEADOS DADOS DE BAJA" << endl;
@@ -42,13 +41,17 @@ void menuEmpleados() {
         cout << "5. ELIMINAR EMPLEADO (BAJA)" << endl;
         cout << "6. RECUPERAR EMPLEADO (DAR DE ALTA)" << endl;
         cout << "7. LISTAR ORDENADOS POR APELLIDO" << endl;
+        rlutil::setColor(PaletaCafe::BASE);
         lineaSimple(100);
+        rlutil::setColor(PaletaCafe::ESPUMA);
         cout << "0. VOLVER" << endl;
+        rlutil::setColor(PaletaCafe::BASE);
         lineaDoble(100);
+        restaurarColor();
 
         opcion = ingresarEntero("SELECCIONE UNA OPCION: ");
 
-        system("cls");
+        limpiarConsola();
         switch (opcion) {
             case 1: altaEmpleado(); break;
             case 2: listarEmpleados(false); break; // false = solo activos
@@ -58,9 +61,9 @@ void menuEmpleados() {
             case 6: recuperarEmpleado(); break;
             case 7: listarEmpleadosOrdenadosPorApellido(); break;
             case 0: return;
-            default: cout << "Opcion incorrecta." << endl; break;
+            default: imprimirMensajeError("Opcion incorrecta."); break;
         }
-        system("pause");
+        pausarConsola();
     }
 }
 
@@ -218,7 +221,7 @@ void modificarEmpleado() {
 
     bool continuar = true;
     while(continuar){
-        system("cls");
+        limpiarConsola();
         cout << "EDITANDO A: " << e.getNombre() << " " << e.getApellido() << endl;
         lineaSimple(40);
         cout << "1. Modificar Nombre" << endl;
@@ -253,7 +256,7 @@ void modificarEmpleado() {
             case 0:
                 continuar = false; break;
             default:
-                cout << "Opcion invalida." << endl; system("pause"); break;
+                imprimirMensajeError("Opcion invalida."); pausarConsola(); break;
         }
     }
 
