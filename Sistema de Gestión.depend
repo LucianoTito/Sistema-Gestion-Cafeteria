@@ -493,7 +493,7 @@
 	"../../Headers/UI/configuraciones.h"
 	"../../Headers/Utilidades/Validaciones.h"
 
-1764741313 source:d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\sistema_de_gestion\sistema de gestión\sources\ui\menugestionclientes.cpp
+1764744008 source:d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\sistema_de_gestion\sistema de gestión\sources\ui\menugestionclientes.cpp
 	<iostream>
 	<cstdlib>
 	<iomanip>
@@ -509,7 +509,7 @@
 
 1764215054 d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\sistema_de_gestion\sistema de gestión\headers\ui\menugestionclientes.h
 
-1764736915 source:d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\sistema_de_gestion\sistema de gestión\sources\ui\menugestionproductos.cpp
+1764744051 source:d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\sistema_de_gestion\sistema de gestión\sources\ui\menugestionproductos.cpp
 	<iostream>
 	<cstdlib>
 	<cstring>
@@ -579,7 +579,7 @@
 	<iomanip>
 	"../../Headers/Utilidades/Tablas.h"
 
-1764733523 d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\sistema_de_gestion\sistema de gestión\headers\utilidades\tablas.h
+1764815585 d:\utn\segundo cuatrimestre\programación ii\sistema de gestiÓn\sistema_de_gestion\sistema de gestión\headers\utilidades\tablas.h
 	<iomanip>
 	<iostream>
 	<string>

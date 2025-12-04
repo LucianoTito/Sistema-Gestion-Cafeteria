@@ -1,6 +1,7 @@
 #include <iostream>
 #include <iomanip>
 
+
 #include "../../Headers/Utilidades/Tablas.h"
 
 using namespace std;
@@ -18,10 +19,16 @@ void limpiarConsola() {
 }
 
 void pausarConsola(const string& mensaje) {
-    cin.ignore(10000, '\n');
+
     rlutil::setColor(PaletaCafe::CREMA);
     cout << mensaje;
     restaurarColor();
+
+    if (cin.rdbuf()->in_avail() > 0) {
+        int ch;
+        while ((ch = cin.get()) != '\n' && ch != EOF) {
+        }
+    }
     rlutil::anykey();
 }
 

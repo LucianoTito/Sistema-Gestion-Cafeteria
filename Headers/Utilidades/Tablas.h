@@ -19,7 +19,7 @@ namespace PaletaCafe {
 // Helpers de estilo
 void restaurarColor();
 void limpiarConsola();
-void pausarConsola(const string& mensaje = "Presione cualquier tecla para continuar...");
+void pausarConsola(const string& mensaje = "Presione ENTER para continuar...");
 void imprimirTituloDecorado(const string& titulo, int ancho = 80);
 void imprimirSubtituloDecorado(const string& subtitulo, int ancho = 80);
 void imprimirMensajeOk(const string& mensaje);
