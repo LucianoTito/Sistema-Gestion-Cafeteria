@@ -139,69 +139,9 @@ void lineaSimple(int n) {
     cout << endl;
 }
 
-// ==========================================
-// FILAS GENERICAS (LEGACY)
-// ==========================================
-
-void imprimirFila5(const char* c1, const char* c2, const char* c3, const char* c4, const char* c5) {
-    const int a1 = 5;
-    const int a2 = 8;
-    const int a3 = 18;
-    const int a4 = 18;
-    const int a5 = 10;
-
-    // Ancho total estimado: ~81 caracteres
-    rlutil::setColor(PaletaCafe::BASE); cout << "|| ";
-    rlutil::setColor(PaletaCafe::ESPUMA); cout << left << setw(a1) << c1;
-    rlutil::setColor(PaletaCafe::BASE); cout << " || ";
-    rlutil::setColor(PaletaCafe::ESPUMA); cout << left << setw(a2) << c2;
-    rlutil::setColor(PaletaCafe::BASE); cout << " || ";
-    rlutil::setColor(PaletaCafe::ESPUMA); cout << left << setw(a3) << c3;
-    rlutil::setColor(PaletaCafe::BASE); cout << " || ";
-    rlutil::setColor(PaletaCafe::ESPUMA); cout << left << setw(a4) << c4;
-    rlutil::setColor(PaletaCafe::BASE); cout << " || ";
-    rlutil::setColor(PaletaCafe::ESPUMA); cout << left << setw(a5) << c5;
-    rlutil::setColor(PaletaCafe::BASE); cout << " ||";
-    restaurarColor();
-    cout << endl;
-}
-
-void imprimirFila4(const char* c1, const char* c2, const char* c3, const char* c4) {
-    const int a1 = 5;
-    const int a2 = 8;
-    const int a3 = 28;
-    const int a4 = 15;
-
-    // Ancho total estimado: ~74 caracteres
-    rlutil::setColor(PaletaCafe::BASE); cout << "|| ";
-    rlutil::setColor(PaletaCafe::ESPUMA); cout << left << setw(a1) << c1;
-    rlutil::setColor(PaletaCafe::BASE); cout << " || ";
-    rlutil::setColor(PaletaCafe::ESPUMA); cout << left << setw(a2) << c2;
-    rlutil::setColor(PaletaCafe::BASE); cout << " || ";
-    rlutil::setColor(PaletaCafe::ESPUMA); cout << left << setw(a3) << c3;
-    rlutil::setColor(PaletaCafe::BASE); cout << " || ";
-    rlutil::setColor(PaletaCafe::ESPUMA); cout << left << setw(a4) << c4;
-    rlutil::setColor(PaletaCafe::BASE); cout << " ||";
-    restaurarColor();
-    cout << endl;
-}
-
-void imprimirFila2(const char* c1, const char* c2) {
-    const int a1 = 18;
-    const int a2 = 15;
-
-    // Ancho total estimado: ~45 caracteres
-    rlutil::setColor(PaletaCafe::BASE); cout << "|| ";
-    rlutil::setColor(PaletaCafe::ESPUMA); cout << left << setw(a1) << c1;
-    rlutil::setColor(PaletaCafe::BASE); cout << " || ";
-    rlutil::setColor(PaletaCafe::ESPUMA); cout << right << setw(a2) << c2;
-    rlutil::setColor(PaletaCafe::BASE); cout << " ||";
-    restaurarColor();
-    cout << endl;
-}
 
 // ==========================================
-// FILAS ESPECIFICAS (DEFINITIVAS)
+// FILAS ESPECIFICAS
 // ==========================================
 
 // Usada en: MenuPedidos

@@ -43,7 +43,7 @@ Thumbs.db
 *.log
 
 # Archivos de datos o binarios del programa
-*.dat
+# *.dat   
 
 # ====================================
 # FIN DEL ARCHIVO .gitignore
