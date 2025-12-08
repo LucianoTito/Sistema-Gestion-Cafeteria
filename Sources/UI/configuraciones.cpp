@@ -6,6 +6,7 @@
 #include "../../Headers/Utilidades/GestorArchivos.h"
 #include "../../Headers/Utilidades/Validaciones.h"
 #include "../../Headers/Utilidades/Tablas.h"
+#include "../../Headers/Utilidades/Estilos.h"
 
 using namespace std;
 
@@ -84,7 +85,7 @@ void backupMenu() {
                 realizarBackupArchivo("Pedidos.dat", "Pedidos.bkp");
                 realizarBackupArchivo("DetallesPedidos.dat", "DetallesPedidos.bkp");
                 realizarBackupArchivo("Pagos.dat", "Pagos.bkp");
-                imprimirMensajeOk(">>> BACKUP COMPLETO FINALIZADO.");
+                imprimirMensajeExito(">>> BACKUP COMPLETO FINALIZADO.");
                 break;
             default: imprimirMensajeError("Opcion invalida."); break;
         }
@@ -135,7 +136,7 @@ void restaurarCopiaSeguridad(){
                 restaurarBackupArchivo("Pedidos.bkp", "Pedidos.dat");
                 restaurarBackupArchivo("DetallesPedidos.bkp", "DetallesPedidos.dat");
                 restaurarBackupArchivo("Pagos.bkp", "Pagos.dat");
-                imprimirMensajeOk(">>> RESTAURACION COMPLETA FINALIZADA.");
+                imprimirMensajeExito(">>> RESTAURACION COMPLETA FINALIZADA.");
                 break;
                 default: imprimirMensajeError("Opcion invalida."); break;
 
@@ -180,7 +181,7 @@ void exportarDatosCSV(){
                 procesarExportacion(exportarPedidosCSV("Pedidos.csv"), "Pedidos");
                 procesarExportacion(exportarDetallesCSV("Detalles.csv"), "Detalles");
                 procesarExportacion(exportarPagosCSV("Pagos.csv"), "Pagos");
-                imprimirMensajeOk(">>> EXPORTACION MASIVA COMPLETADA.");
+                imprimirMensajeExito(">>> EXPORTACION MASIVA COMPLETADA.");
                 break;
             default: imprimirMensajeError("Incorrecto."); break;
         }
@@ -195,7 +196,7 @@ void exportarDatosCSV(){
 void realizarBackupArchivo(const char* nombreReal, const char* nombreBkp) {
     if (existeArchivo(nombreReal)) {
         if (copiarArchivoBinario(nombreReal, nombreBkp)) {
-            imprimirMensajeOk(string("Backup creado: ") + nombreBkp);
+            imprimirMensajeExito(string("Backup creado: ") + nombreBkp);
         } else {
             imprimirMensajeError(string("Fallo al crear backup de ") + nombreReal);
         }
@@ -209,7 +210,7 @@ void restaurarBackupArchivo(const char* nombreBkp, const char* nombreReal) {
     if (existeArchivo(nombreBkp)) {
         if (copiarArchivoBinario(nombreBkp, nombreReal)) {
 
-            imprimirMensajeOk(string("Restaurado: ") + nombreReal);
+            imprimirMensajeExito(string("Restaurado: ") + nombreReal);
         } else {
 
             imprimirMensajeError(string("Fallo al restaurar ") + nombreReal);
@@ -221,6 +222,6 @@ void restaurarBackupArchivo(const char* nombreBkp, const char* nombreReal) {
 }
 
 void procesarExportacion(bool exito, const char* nombreArchivo) {
-    if (exito) imprimirMensajeOk(string("Exportado: ") + nombreArchivo);
+    if (exito) imprimirMensajeExito(string("Exportado: ") + nombreArchivo);
     else imprimirMensajeError(string("Fallo exportacion de ") + nombreArchivo);
 }

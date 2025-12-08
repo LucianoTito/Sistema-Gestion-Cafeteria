@@ -33,6 +33,10 @@ float Pagos::getMontoPagado() const { return _montoPagado; }
 void Pagos::setFechaPago(Fecha fecha){
 _fechaPago= fecha;
 }
+
+void Pagos::setIdPago(int id) { _idPago = id; }
+void Pagos::setIdPedido(int id) { _idPedido = id; }
+
 void Pagos::setMetodoPago(int metodo, bool mostrarAviso) {
 
     if (metodo >= 1 && metodo <= 3) {

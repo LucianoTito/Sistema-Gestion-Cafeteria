@@ -7,6 +7,7 @@
 #include "../../Headers/Entities/Producto.h"
 #include "../../Headers/Utilidades/Validaciones.h"
 #include "../../Headers/Utilidades/Tablas.h"
+#include "../../Headers/Utilidades/Estilos.h"
 
 
 

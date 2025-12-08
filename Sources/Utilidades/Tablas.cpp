@@ -1,125 +1,11 @@
 #include <iostream>
 #include <iomanip>
-
-
 #include "../../Headers/Utilidades/Tablas.h"
+#include "../../Headers/Utilidades/Estilos.h" // Aqui traemos los colores
+#include "../../Headers/Utilidades/rlutil.h"
 
 using namespace std;
 
-// ==========================================
-// PALETA Y ESTILO GENERAL
-// ==========================================
-
-void restaurarColor() {
-    rlutil::resetColor();
-}
-
-void limpiarConsola() {
-    rlutil::cls();
-}
-
-void pausarConsola(const string& mensaje) {
-
-    rlutil::setColor(PaletaCafe::CREMA);
-    cout << mensaje;
-    restaurarColor();
-
-    if (cin.rdbuf()->in_avail() > 0) {
-        int ch;
-        while ((ch = cin.get()) != '\n' && ch != EOF) {
-        }
-    }
-    rlutil::anykey();
-}
-
-void imprimirTituloDecorado(const string& titulo, int ancho) {
-    rlutil::setColor(PaletaCafe::BASE);
-    lineaDoble(ancho);
-    rlutil::setColor(PaletaCafe::ESPUMA);
-    int padding = (ancho - static_cast<int>(titulo.size())) / 2;
-    if (padding < 0) padding = 0;
-    cout << string(padding, ' ') << titulo << endl;
-    rlutil::setColor(PaletaCafe::BASE);
-    lineaDoble(ancho);
-    restaurarColor();
-}
-
-void imprimirSubtituloDecorado(const string& subtitulo, int ancho) {
-    rlutil::setColor(PaletaCafe::CREMA);
-    cout << string((ancho - static_cast<int>(subtitulo.size())) / 2, ' ') << subtitulo << endl;
-    restaurarColor();
-}
-
-void imprimirMensajeOk(const string& mensaje) {
-    rlutil::setColor(PaletaCafe::OK);
-    cout << "✅ " << mensaje << endl;
-    restaurarColor();
-}
-
-void imprimirMensajeAdvertencia(const string& mensaje) {
-    rlutil::setColor(PaletaCafe::ADVERTENCIA);
-    cout << "⚠️  " << mensaje << endl;
-    restaurarColor();
-}
-
-void imprimirMensajeError(const string& mensaje) {
-    rlutil::setColor(PaletaCafe::ERROR);
-    cout << "❌ " << mensaje << endl;
-    restaurarColor();
-}
-
-void imprimirPrompt(const string& prompt) {
-    rlutil::setColor(PaletaCafe::CREMA);
-    cout << prompt;
-    restaurarColor();
-}
-
-void imprimirBannerCafe() {
-    // Margen izquierdo para centrar el diseño
-    string m = "        ";
-
-    // 1. EL HUMO (Color: HUMO)
-    rlutil::setColor(PaletaCafe::HUMO);
-    cout << m << "      (  )   (   )  ) " << endl;
-    cout << m << "       ) (   )  (  (  " << endl;
-    cout << m << "       ( )  (    ) )  " << endl;
-
-    // 2. EL BORDE SUPERIOR (Color: BASE)
-    rlutil::setColor(PaletaCafe::BASE);
-    cout << m << "      ___________    " << endl;
-
-    // 3. CUERPO DE LA TAZA CON ESPUMA Y ASA MEJORADA
-    // Línea 1: Superficie de la espuma
-    cout << m << "     (";                           // Borde izq (BASE)
-    rlutil::setColor(PaletaCafe::ESPUMA); cout << "..........."; // Espuma (ESPUMA)
-    rlutil::setColor(PaletaCafe::BASE);   cout << ")   " << endl; // Borde der (BASE)
-
-    // Línea 2: Cuerpo superior + Inicio del asa curvada
-    cout << m << "     |";                           // Pared izq
-    rlutil::setColor(PaletaCafe::ESPUMA); cout << "..........."; // Relleno espuma
-    rlutil::setColor(PaletaCafe::BASE);   cout << "|-. " << endl; // Pared der + inicio asa
-
-    // Línea 3: Cuerpo medio + Parte externa del asa (creando el hueco)
-    cout << m << "     |";
-    rlutil::setColor(PaletaCafe::ESPUMA); cout << "...........";
-    rlutil::setColor(PaletaCafe::BASE);   cout << "|  \\" << endl; // El hueco se forma a la izquierda de la '\'
-
-    // Línea 4: Cuerpo medio bajo + Parte vertical del asa
-    cout << m << "     |";
-    rlutil::setColor(PaletaCafe::ESPUMA); cout << "...........";
-    rlutil::setColor(PaletaCafe::BASE);   cout << "|   |" << endl; // El hueco es evidente aquí
-
-    // Línea 5: Cuerpo inferior + Curva baja del asa
-    cout << m << "     |";
-    rlutil::setColor(PaletaCafe::ESPUMA); cout << "...........";
-    rlutil::setColor(PaletaCafe::BASE);   cout << "| _/" << endl;
-
-    // Línea 6: Base de la taza + Cierre del asa
-    cout << m << "      \\_________/-'  " << endl;
-
-    restaurarColor();
-    cout << endl; // Un salto de línea extra para separar del menú
-}
 // ==========================================
 // FUNCIONES DE LINEAS
 // ==========================================
@@ -131,7 +17,6 @@ void lineaDoble(int n) {
     cout << endl;
 }
 
-
 void lineaSimple(int n) {
     rlutil::setColor(PaletaCafe::BASE);
     for (int i = 0; i < n; i++) cout << "-";
@@ -139,20 +24,12 @@ void lineaSimple(int n) {
     cout << endl;
 }
 
-
 // ==========================================
 // FILAS ESPECIFICAS
 // ==========================================
 
-// Usada en: MenuPedidos
-// Ancho Total: 74 caracteres
 void imprimirFilaPedido(const char* id, const char* fecha, const char* idCli, const char* idEmp, const char* total) {
-    const int wId = 8;
-    const int wFecha = 12;
-    const int wCli = 12;
-    const int wEmp = 12;
-    const int wTotal = 12;
-
+    const int wId = 8; const int wFecha = 12; const int wCli = 12; const int wEmp = 12; const int wTotal = 12;
     rlutil::setColor(PaletaCafe::BASE); cout << "|| ";
     rlutil::setColor(PaletaCafe::ESPUMA); cout << left << setw(wId) << id;
     rlutil::setColor(PaletaCafe::BASE); cout << " | ";
@@ -164,19 +41,11 @@ void imprimirFilaPedido(const char* id, const char* fecha, const char* idCli, co
     rlutil::setColor(PaletaCafe::BASE); cout << " | ";
     rlutil::setColor(PaletaCafe::ESPUMA); cout << right << setw(wTotal) << total;
     rlutil::setColor(PaletaCafe::BASE); cout << " ||";
-    restaurarColor();
-    cout << endl;
+    restaurarColor(); cout << endl;
 }
 
-// Usada en: Reportes de Pagos
-// Ancho Total: 78 caracteres (alineado a otros listados)
 void imprimirFilaPago(const char* idPago, const char* idPedido, const char* fecha, const char* metodo, const char* monto) {
-    const int wIdPago = 8;
-    const int wIdPedido = 10;
-    const int wFecha = 12;
-    const int wMetodo = 16;
-    const int wMonto = 12;
-
+    const int wIdPago = 8; const int wIdPedido = 10; const int wFecha = 12; const int wMetodo = 16; const int wMonto = 12;
     rlutil::setColor(PaletaCafe::BASE); cout << "|| ";
     rlutil::setColor(PaletaCafe::ESPUMA); cout << left << setw(wIdPago) << idPago;
     rlutil::setColor(PaletaCafe::BASE); cout << " | ";
@@ -188,20 +57,11 @@ void imprimirFilaPago(const char* idPago, const char* idPedido, const char* fech
     rlutil::setColor(PaletaCafe::BASE); cout << " | ";
     rlutil::setColor(PaletaCafe::ESPUMA); cout << right << setw(wMonto) << monto;
     rlutil::setColor(PaletaCafe::BASE); cout << " ||";
-    restaurarColor();
-    cout << endl;
+    restaurarColor(); cout << endl;
 }
 
-// Usada en: MenuEmpleados
-// Ancho Total: 122 caracteres
 void imprimirFilaEmpleado(const char* id, const char* nombre, const char* apellido, const char* telefono, const char* mail, const char* puesto) {
-    const int wId = 6;
-    const int wNombre = 15;
-    const int wApellido = 15;
-    const int wTel = 15;
-    const int wMail = 35;
-    const int wPuesto = 15;
-
+    const int wId = 6; const int wNombre = 15; const int wApellido = 15; const int wTel = 15; const int wMail = 35; const int wPuesto = 15;
     rlutil::setColor(PaletaCafe::BASE); cout << "|| ";
     rlutil::setColor(PaletaCafe::ESPUMA); cout << left << setw(wId) << id;
     rlutil::setColor(PaletaCafe::BASE); cout << " | ";
@@ -215,18 +75,11 @@ void imprimirFilaEmpleado(const char* id, const char* nombre, const char* apelli
     rlutil::setColor(PaletaCafe::BASE); cout << " | ";
     rlutil::setColor(PaletaCafe::ESPUMA); cout << left << setw(wPuesto) << puesto;
     rlutil::setColor(PaletaCafe::BASE); cout << " ||";
-    restaurarColor();
-    cout << endl;
+    restaurarColor(); cout << endl;
 }
 
-// Usada en: MenuGestionProductos
-// Ancho Total: 81 caracteres
 void imprimirFilaProducto(const char* id, const char* nombre, const char* precio, const char* stock) {
-    const int wId = 6;
-    const int wNombre = 35;
-    const int wPrecio = 15;
-    const int wStock = 10;
-
+    const int wId = 6; const int wNombre = 35; const int wPrecio = 15; const int wStock = 10;
     rlutil::setColor(PaletaCafe::BASE); cout << "|| ";
     rlutil::setColor(PaletaCafe::ESPUMA); cout << left << setw(wId) << id;
     rlutil::setColor(PaletaCafe::BASE); cout << " | ";
@@ -236,19 +89,11 @@ void imprimirFilaProducto(const char* id, const char* nombre, const char* precio
     rlutil::setColor(PaletaCafe::BASE); cout << " | ";
     rlutil::setColor(PaletaCafe::ESPUMA); cout << right << setw(wStock) << stock;
     rlutil::setColor(PaletaCafe::BASE); cout << " ||";
-    restaurarColor();
-    cout << endl;
+    restaurarColor(); cout << endl;
 }
 
-// Usada en: MenuGestionClientes
-// Ancho Total: 94 caracteres (Perfecto)
 void imprimirFilaCliente(const char* id, const char* nombre, const char* apellido, const char* telefono, const char* mail) {
-    const int wId = 6;
-    const int wNom = 15;
-    const int wApe = 15;
-    const int wTel = 15;
-    const int wMail = 25;
-
+    const int wId = 6; const int wNom = 15; const int wApe = 15; const int wTel = 15; const int wMail = 25;
     rlutil::setColor(PaletaCafe::BASE); cout << "|| ";
     rlutil::setColor(PaletaCafe::ESPUMA); cout << left << setw(wId) << id;
     rlutil::setColor(PaletaCafe::BASE); cout << " | ";
@@ -260,33 +105,21 @@ void imprimirFilaCliente(const char* id, const char* nombre, const char* apellid
     rlutil::setColor(PaletaCafe::BASE); cout << " | ";
     rlutil::setColor(PaletaCafe::ESPUMA); cout << left << setw(wMail) << mail;
     rlutil::setColor(PaletaCafe::BASE); cout << " ||";
-    restaurarColor();
-    cout << endl;
+    restaurarColor(); cout << endl;
 }
 
-// Usada en: Reportes (Recaudacion)
-// Ancho Total: 50 caracteres (Ajustado)
 void imprimirFilaRecaudacion(const char* mes, const char* total) {
-    const int wMes = 20;
-    const int wTotal = 21; // Ajustado para sumar 50 con los bordes
-
+    const int wMes = 20; const int wTotal = 21;
     rlutil::setColor(PaletaCafe::BASE); cout << "|| ";
     rlutil::setColor(PaletaCafe::ESPUMA); cout << left << setw(wMes) << mes;
     rlutil::setColor(PaletaCafe::BASE); cout << " | ";
     rlutil::setColor(PaletaCafe::ESPUMA); cout << right << setw(wTotal) << total;
     rlutil::setColor(PaletaCafe::BASE); cout << " ||";
-    restaurarColor();
-    cout << endl;
+    restaurarColor(); cout << endl;
 }
 
-// Usada en: Reportes (Ranking Productos)
-// Ancho Total: 75 caracteres
 void imprimirFilaRankingProductos(const char* pos, const char* id, const char* nombre, const char* cantidad) {
-    const int wPos = 5;
-    const int wId = 8;
-    const int wNom = 37; // Aumentado para ajustar el ancho total a 75
-    const int wCant = 10;
-
+    const int wPos = 5; const int wId = 8; const int wNom = 37; const int wCant = 10;
     rlutil::setColor(PaletaCafe::BASE); cout << "|| ";
     rlutil::setColor(PaletaCafe::ESPUMA); cout << left << setw(wPos) << pos;
     rlutil::setColor(PaletaCafe::BASE); cout << " | ";
@@ -296,19 +129,11 @@ void imprimirFilaRankingProductos(const char* pos, const char* id, const char* n
     rlutil::setColor(PaletaCafe::BASE); cout << " | ";
     rlutil::setColor(PaletaCafe::ESPUMA); cout << right << setw(wCant) << cantidad;
     rlutil::setColor(PaletaCafe::BASE); cout << " ||";
-    restaurarColor();
-    cout << endl;
+    restaurarColor(); cout << endl;
 }
 
-// Usada en: Reportes (Ranking Empleados)
-// Ancho Total: 80 caracteres
 void imprimirFilaRankingEmpleados(const char* pos, const char* id, const char* apellido, const char* nombre, const char* cantidad) {
-    const int wPos = 5;
-    const int wId = 8;
-    const int wApe = 20; // Ajustado para total 80
-    const int wNom = 19; // Ajustado para total 80
-    const int wCant = 10;
-
+    const int wPos = 5; const int wId = 8; const int wApe = 20; const int wNom = 19; const int wCant = 10;
     rlutil::setColor(PaletaCafe::BASE); cout << "|| ";
     rlutil::setColor(PaletaCafe::ESPUMA); cout << left << setw(wPos) << pos;
     rlutil::setColor(PaletaCafe::BASE); cout << " | ";
@@ -320,6 +145,5 @@ void imprimirFilaRankingEmpleados(const char* pos, const char* id, const char* a
     rlutil::setColor(PaletaCafe::BASE); cout << " | ";
     rlutil::setColor(PaletaCafe::ESPUMA); cout << right << setw(wCant) << cantidad;
     rlutil::setColor(PaletaCafe::BASE); cout << " ||";
-    restaurarColor();
-    cout << endl;
+    restaurarColor(); cout << endl;
 }

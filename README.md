@@ -1,127 +1,109 @@
-<h1 align="center">☕ Sistema de Gestión de Cafetería</h1>
+<div align="center">
+  <h1>☕ Sistema de Gestión para Cafetería</h1>
+  
+  <p>
+    <strong>Una solución integral de gestión comercial (ERP) desarrollada en C++ moderno.</strong>
+  </p>
 
-<p align="center">
-  <strong>Proyecto académico – Programación II (UTN FRGP)</strong><br>
-  <em>Desarrollado en C++ | Paradigma Orientado a Objetos | Code::Blocks</em>
-</p>
+  <p>
+    <a href="#-demo">Ver Demo</a> •
+    <a href="#-características-técnicas">Tecnologías</a> •
+    <a href="#-instalación">Instalación</a> •
+    <a href="#-contacto">Contacto</a>
+  </p>
 
----
-
-<p align="center">
-  <img src="https://img.shields.io/badge/Lenguaje-C%2B%2B-blue?style=flat-square&logo=cplusplus&logoColor=white" alt="C++ Badge"/>
-  <img src="https://img.shields.io/badge/Entorno-Code::Blocks-darkgreen?style=flat-square&logo=codeblocks" alt="Code::Blocks Badge"/>
-  <img src="https://img.shields.io/badge/Paradigma-POO-orange?style=flat-square" alt="POO Badge"/>
-  <img src="https://img.shields.io/badge/SO-Windows-lightgray?style=flat-square&logo=windows" alt="Windows Badge"/>
-</p>
-
----
-
-## 📘 Descripción general
-Este proyecto fue desarrollado en el marco de la materia **Programación II** de la **Tecnicatura Universitaria en Programación** de la **Universidad Tecnológica Nacional – Facultad Regional General Pacheco (UTN-FRGP)**.
-
-El sistema permite **gestionar las operaciones internas de una cafetería**, incluyendo la administración de clientes, empleados, productos, pedidos, pagos y reportes.  
-Fue desarrollado íntegramente en **C++**, aplicando principios de **Programación Orientada a Objetos (POO)** y **persistencia en archivos binarios**, con una interfaz de **menús por consola**.
+  <p>
+    <img src="https://img.shields.io/badge/C%2B%2B-14%2F17-00599C?style=for-the-badge&logo=c%2B%2B&logoColor=white" alt="C++"/>
+    <img src="https://img.shields.io/badge/Paradigma-POO-orange?style=for-the-badge" alt="POO"/>
+    <img src="https://img.shields.io/badge/Persistencia-Binaria-lightgrey?style=for-the-badge&logo=files" alt="Binary Files"/>
+    <img src="https://img.shields.io/badge/IDE-Code%3A%3ABlocks-green?style=for-the-badge&logo=codeblocks" alt="CodeBlocks"/>
+  </p>
+</div>
 
 ---
 
-## 🧩 Funcionalidades principales
-✅ Gestión de productos: alta, baja, modificación y listado  
-✅ Gestión de clientes y empleados  
-✅ Gestión de pedidos y detalles de pedido  
-✅ Gestión de pagos y métodos de cobro  
-✅ Generación de reportes: listados, totales y ranking de clientes  
-✅ Configuración general del sistema  
+## 🚀 Sobre el Proyecto
+
+Este sistema es una aplicación de consola de alto rendimiento diseñada para administrar el flujo operativo de una cafetería. A diferencia de los ejercicios académicos estándar, este proyecto se enfoca en la **persistencia de datos real**, la **arquitectura en capas** y una **experiencia de usuario (UX)** cuidada mediante el manejo avanzado de buffers y colores en consola.
+
+El objetivo fue simular un entorno de producción donde la integridad de los datos (Clientes, Stock, Facturación) y la escalabilidad del código son prioritarios.
+
+## 📹 Demo
+
+> *Visualización del flujo de toma de pedidos y generación de tickets.*
+
+![Demo del Sistema](https://via.placeholder.com/800x400?text=AQUI+VA+TU+GIF+DEL+SISTEMA+FUNCIONANDO)
+*(Nota: Reemplaza este link por la URL de tu GIF real)*
 
 ---
 
-## 🏗️ Arquitectura del proyecto
+## 🧩 Funcionalidades Clave
 
-El sistema está diseñado bajo una estructura modular, separando la lógica por capas para facilitar la mantenibilidad y comprensión del código.
+### 📦 Gestión de Inventario y Ventas
+* **CRUD Completo:** Alta, Baja y Modificación de Productos y Empleados con validaciones en tiempo real.
+* **Control de Stock:** Validación automática de disponibilidad antes de confirmar pedidos.
+* **Sistema de Ventas:** Generación de pedidos vinculando Cliente + Empleado + Múltiples productos.
 
+### 📊 Reportes y Business Intelligence
+* **Reportes Financieros:** Recaudación histórica y filtrada por períodos.
+* **Rankings:** Algoritmos de ordenamiento para mostrar "Clientes VIP" y productos más vendidos.
+* **Historial:** Consulta de tickets pasados con detalle desglosado.
+
+### 🎨 Interfaz de Usuario (TUI)
+* **Diseño Visual:** Uso de librería `rlutil` para manipulación de colores y posicionamiento de cursor.
+* **Navegación Fluida:** Menús interactivos controlados por teclado sin necesidad de "limpiar pantalla" forzoso (flickering reducido).
+
+---
+
+## 🛠 Características Técnicas (Under the Hood)
+
+Este proyecto demuestra el dominio de conceptos avanzados de C++:
+
+* **Programación Orientada a Objetos (POO):** Uso extensivo de Clases, Herencia, Encapsulamiento y Polimorfismo.
+* **Gestión de Memoria:** Manejo eficiente de punteros y asignación dinámica de memoria durante la ejecución de los menús.
+* **Persistencia de Datos:** Implementación de un motor de persistencia propio utilizando archivos binarios (`.dat`) y punteros de archivo (`FILE*`) para lectura/escritura aleatoria y secuencial.
+* **Arquitectura Limpia:** Separación de responsabilidades:
+    * `Entities`: Modelado de datos.
+    * `Persistence`: Capa de acceso a datos (DAO).
+    * `UI`: Capa de presentación y validación de entrada.
+
+---
+
+## 🏗️ Estructura del Proyecto
+
+```text
 Sistema de Gestión/
 │
-├── Headers/
-│ ├── Entities/ # Clases base del sistema (Cliente, Producto, Pedido, etc.)
-│ ├── Persistence/ # Manejo de archivos binarios (.dat)
-│ └── UI/ # Módulos de interfaz y menús por consola
-│     ├── menuPrincipal.h
-│     ├── menuGestionProductos.h
-│     ├── menuGestionClientes.h
-│     ├── menuEmpleados.h
-│     └── menuPedidos.h
+├── Headers/          # Definición de Clases y Prototipos (.h)
+│   ├── Entities/     # Modelos (Cliente, Producto, etc.)
+│   ├── Persistence/  # Manejadores de Archivos (Clases Archivo*)
+│   └── UI/           # Lógica de Interfaz y Menús
 │
-├── Sources/
-│ ├── Entities/ # Implementación de clases
-│ ├── Persistence/ # Implementación de persistencia
-│ ├── UI/ # Implementación de menús y reportes
-│ │   ├── menuPrincipal.cpp
-│ │   ├── menuGestionProductos.cpp
-│ │   ├── menuGestionClientes.cpp
-│ │   ├── menuEmpleados.cpp
-│ │   └── menuPedidos.cpp
-│ ├── funciones.cpp # Funciones auxiliares
-│ └── main.cpp # Punto de entrada principal
+├── Sources/          # Implementación de la Lógica (.cpp)
+│   ├── Entities/     
+│   ├── Persistence/  
+│   └── UI/           
 │
-├── Productos.dat # Archivo binario con productos
-├── Sistema de Gestión.cbp # Proyecto Code::Blocks
-└── .gitignore
+├── Data/             # Archivos binarios de base de datos (generados al ejecutar)
+└── main.cpp          # Punto de entrada
 
+💻 Instalación y Ejecución
+Opción A: Code::Blocks (Recomendado)
+Clonar el repositorio.
 
----
+Abrir el archivo Sistema de Gestión.cbp.
 
-## ⚙️ Tecnologías utilizadas
+Compilar y Ejecutar (F9).
 
-| Categoría | Herramienta |
-|------------|--------------|
-| 💻 Lenguaje | **C++** |
-| 🧠 Paradigma | **Programación Orientada a Objetos (POO)** |
-| 🧰 IDE | **Code::Blocks** |
-| 💾 Persistencia | **Archivos binarios (`.dat`)** |
-| 🪟 Sistema Operativo | **Windows 10/11** |
+Opción B: Compilación Manual (G++)
+Si prefieres usar la terminal, asegúrate de enlazar todos los archivos fuente:
 
----
+g++ Sources/*.cpp Sources/Entities/*.cpp Sources/Persistence/*.cpp Sources/UI/*.cpp Sources/Utilidades/*.cpp -o sistema_cafeteria.exe
+./sistema_cafeteria.exe
 
-## 🚀 Cómo compilar y ejecutar
-1. Abrir el proyecto en Code::Blocks:  
+👨‍💻 Autor
+Luciano Facundo Tito Cedrón Software Developer | C++ Enthusiast
 
-2. Compilar desde el menú **Build → Rebuild**.  
-3. Ejecutar el programa desde Code::Blocks o desde el ejecutable generado en la carpeta de compilación.
+<p> <a href="https://www.google.com/search?q=https://www.linkedin.com/in/lucianotito/" target="_blank"> <img src="https://www.google.com/search?q=https://img.shields.io/badge/LinkedIn-Connect-blue%3Fstyle%3Dfor-the-badge%26logo%3Dlinkedin" alt="LinkedIn"/> </a> <a href="mailto:lucianotitocedron@gmail.com"> <img src="https://www.google.com/search?q=https://img.shields.io/badge/Email-Contactame-red%3Fstyle%3Dfor-the-badge%26logo%3Dgmail%26logoColor%3Dwhite" alt="Email"/> </a> </p>
 
----
-
-## 👨‍💻 Autor
-**Luciano Facundo Tito Cedrón**  
-📍 Salta, Argentina  
-📧 [lucianotitocedron@gmail.com](mailto:lucianotitocedron@gmail.com)  
-🎓 UTN – Facultad Regional General Pacheco  
-
-<p align="center">
-<a href="mailto:lucianotitocedron@gmail.com">
- <img src="https://img.shields.io/badge/Contacto-Email-blue?style=for-the-badge&logo=gmail&logoColor=white" />
-</a>
-<a href="https://github.com/LucianoTito">
- <img src="https://img.shields.io/badge/GitHub-LucianoTito-black?style=for-the-badge&logo=github" />
-</a>
-</p>
-
----
-
-## 🏫 Información académica
-**Materia:** Programación II  
-**Profesores:** Maximiliano Wenner - Martín García
-**Año:** 2025  
-**Carrera:** Tecnicatura Universitaria en Programación  
-**Institución:** Universidad Tecnológica Nacional – Facultad Regional General Pacheco  
-
----
-
-## 🗂️ Licencia
-📘 Proyecto académico con fines educativos.  
-Se permite su uso, análisis y mejora con fines de aprendizaje.
-
----
-
-<p align="center">
-<sub>© 2025 Luciano Facundo Tito Cedrón — Proyecto académico para UTN FRGP.</sub>
-</p>
-
+<p align="center"> <sub>Proyecto desarrollado en el marco de la Tecnicatura Universitaria en Programación (UTN FRGP) - 2025.</sub> </p>

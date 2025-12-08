@@ -1,7 +1,9 @@
 #include <iostream>
 #include <cstdlib>
 #include <cstdio>
-
+#include <iomanip>
+#include <limits>
+#include <windows.h> // Necesario para la funcion Sleep()
 
 #include "../../Headers/UI/menuPedidos.h"
 #include "../../Headers/Entities/Cliente.h"
@@ -20,25 +22,38 @@
 #include "../../Headers/Utilidades/Validaciones.h"
 #include "../../Headers/Utilidades/archivoPago.h"
 #include "../../Headers/Utilidades/Tablas.h"
+#include "../../Headers/Utilidades/Estilos.h"
+#include "../../Headers/Utilidades/rlutil.h"
 
 using namespace std;
 
-// Constante para mantener la coherencia visual en todo el menú.
+// Anchos estandarizados para las tablas
 const int ANCHO_MENU = 80;
+const int ANCHO_TABLA_CLIENTES = 94;
+
+const int ANCHO_TABLA_EMPLEADOS = 120;
+const int ANCHO_TABLA_PRODUCTOS = 81;
 
 // ==========================================
-// PROTOTIPOS DE FUNCIONES AUXILIARES
+// PROTOTIPOS LOCALES
 // ==========================================
 void ordenarPedidosPorFecha(Pedido vectorPedidos[], int cantidad);
 void mostrarEncabezadoTablaPedidos();
 void mostrarFilaPedido(Pedido p);
+
+// Funciones visuales de selección
+void listarProductosParaSeleccion();
+void listarClientesParaSeleccion();
+void listarEmpleadosParaSeleccion();
+void mostrarTablaDetallesActuales(int idPedido);
+
+// Submenús y Consultas
 void menuConsultasPedidos();
 void consultaPedidosPorRangoFechas();
 void consultaPedidosPorCliente();
 void consultaPedidosPorEmpleado();
 
-// Helpers importantes:
-// Permiten aislar la lógica compleja (como buscar y validar) del flujo principal.
+// Helpers Lógicos
 int seleccionarClienteValido();
 int seleccionarEmpleadoValido();
 bool cargarProductosEnPedido(Pedido &regPedido, int &cantidadDetallesIniciales);
@@ -50,20 +65,23 @@ void revertirCambiosStock(int idPedido);
 // ==========================================
 void menuPedidos(){
     int opcion;
-
     while (true){
         limpiarConsola();
         imprimirTituloDecorado("GESTION DE PEDIDOS", ANCHO_MENU);
+
         rlutil::setColor(PaletaCafe::CREMA);
         cout << "1. REALIZAR UN PEDIDO" << endl;
         cout << "2. VER DETALLE DE UN PEDIDO" << endl;
         cout << "3. LISTAR PEDIDOS (ORDENADOS POR FECHA)" << endl;
         cout << "4. CONSULTAS DE PEDIDOS" << endl;
         cout << "5. ANULAR UN PEDIDO (BAJA LOGICA)" << endl;
+
         rlutil::setColor(PaletaCafe::BASE);
         lineaSimple(ANCHO_MENU);
+
         rlutil::setColor(PaletaCafe::ESPUMA);
         cout << "0. VOLVER AL MENU PRINCIPAL" << endl;
+
         rlutil::setColor(PaletaCafe::BASE);
         lineaDoble(ANCHO_MENU);
         restaurarColor();
@@ -71,7 +89,7 @@ void menuPedidos(){
         opcion = ingresarEntero("SELECCIONE UNA OPCION: ");
         limpiarConsola();
 
-        bool mostrarPausa = true;
+        bool pausar = true;
 
         switch (opcion){
             case 1: realizarPedido(); break;
@@ -79,202 +97,383 @@ void menuPedidos(){
             case 3: listarPedidos(); break;
             case 4:
                 menuConsultasPedidos();
-                mostrarPausa = false; // No pausamos aquí porque el submenú ya tiene sus pausas.
+                pausar = false;
                 break;
             case 5: anularPedido(); break;
-            case 0: return; // Rompe el while(true) y vuelve al main.
+            case 0: return;
             default: imprimirMensajeError("Opcion incorrecta."); break;
         }
-         if(mostrarPausa) pausarConsola();
+
+        if(pausar) {
+            // CORRECCIÓN: cin.sync() limpia el buffer sin bloquear si está vacío.
+            // Esto evita el problema de tener que dar dos Enter o que se salte la pausa.
+            cin.sync();
+            pausarConsola();
+        }
     }
 }
 
 // ==========================================
-// FUNCION PRINCIPAL: REALIZAR PEDIDO (ALTA)
+// FUNCION PRINCIPAL: REALIZAR PEDIDO
 // ==========================================
-// Esta función orquesta todo el proceso de venta. Es como el "Main" de una transacción.
 void realizarPedido() {
-    // Instanciamos los gestores de archivos necesarios.
     ArchivoPedido arcPedido ("Pedidos.dat");
     ArchivoDetallePedido arcDetalle ("DetallesPedidos.dat");
     ArchivoPagos arcPagos ("Pagos.dat");
 
-    // Guardamos la cantidad actual de registros para saber el ID del nuevo pedido
-    // y para poder restaurar el archivo si algo sale mal (rollback manual).
     int cantidadPedidosPrevios = arcPedido.contarRegistros();
     int cantidadDetallesInicial = arcDetalle.contarRegistros();
 
-    cout << "-------- REALIZAR NUEVO PEDIDO --------" << endl;
-
-    // 1. VALIDACIÓN DE CLIENTE
-    // Usamos una función helper que se encarga de mostrar la lista y validar que el ID exista y esté activo.
-    int idCliente = seleccionarClienteValido();
-    if (idCliente == -1) return; // Si retorna -1, el usuario canceló o hubo error.
-
+    // PASO 1: CLIENTE
     limpiarConsola();
+    imprimirTituloDecorado("NUEVO PEDIDO - PASO 1: SELECCIONAR CLIENTE", ANCHO_TABLA_CLIENTES);
 
-    // 2. VALIDACIÓN DE EMPLEADO
+    int idCliente = seleccionarClienteValido();
+    if (idCliente == -1) return;
+
+    // PASO 2: EMPLEADO
+    limpiarConsola();
+    imprimirTituloDecorado("NUEVO PEDIDO - PASO 2: SELECCIONAR EMPLEADO", ANCHO_TABLA_EMPLEADOS);
+
     int idEmpleado = seleccionarEmpleadoValido();
     if (idEmpleado == -1) return;
 
     limpiarConsola();
 
-    // 3. CREACIÓN DEL ENCABEZADO DEL PEDIDO (EN MEMORIA)
+    // 3. INICIALIZAR PEDIDO
     Pedido regPedido;
-    int idNuevoPedido = cantidadPedidosPrevios + 1; // ID Autonumérico
-    // Cargar() pedirá datos extra como el Nro de Mesa y establecerá la Fecha actual.
+    int idNuevoPedido = cantidadPedidosPrevios + 1;
     regPedido.Cargar(idNuevoPedido, idCliente, idEmpleado);
 
-    // 4. CARGA DE PRODUCTOS (EL DETALLE)
-    // Pasamos 'regPedido' por referencia (&) porque al agregar productos, el SUBTOTAL del pedido cambiará.
+    // 4. CARGA DE PRODUCTOS (Carrito Visual)
     if (!cargarProductosEnPedido(regPedido, cantidadDetallesInicial)) {
-        cout << "Pedido cancelado (sin productos cargados)." << endl;
+        imprimirMensajeAdvertencia("Pedido cancelado (sin productos).");
         return;
     }
 
-    // 5. PERSISTENCIA: GRABAR EL PEDIDO EN DISCO
+    // 5. GRABAR PEDIDO
     if (!arcPedido.grabarRegistro(regPedido)){
-        cout << "ERROR CRITICO: No se pudo grabar el pedido." << endl;
-        // Si falla grabar el encabezado, debemos deshacer los cambios de stock y borrar los detalles.
+        imprimirMensajeError("ERROR CRITICO: No se pudo grabar el pedido.");
         revertirCambiosStock(idNuevoPedido);
         arcDetalle.restaurarCantidadRegistros(cantidadDetallesInicial);
         return;
     }
 
-    // 6. GESTIÓN DEL PAGO
+    // 6. GESTIONAR PAGO
+    limpiarConsola();
+    imprimirTituloDecorado("NUEVO PEDIDO - PASO 4: PAGO", ANCHO_MENU);
+
     if (!registrarPagoParaPedido(arcPagos, regPedido)){
-        cout << "El pago no se concreto. Se revertira el pedido." << endl;
-        // Si no paga, deshacemos TODO: Stock, Detalles y el Pedido mismo.
+        imprimirMensajeError("Pago no concretado. Revertiendo pedido...");
         revertirCambiosStock(idNuevoPedido);
         arcDetalle.restaurarCantidadRegistros(cantidadDetallesInicial);
         arcPedido.restaurarCantidadRegistros(cantidadPedidosPrevios);
         return;
     }
 
-    cout << endl << "------ PEDIDO COMPLETADO EXITOSAMENTE ------" << endl;
+    imprimirMensajeExito("PEDIDO COMPLETADO EXITOSAMENTE");
 }
 
 // ==========================================
-// LOGICA DE CARGA DE PRODUCTOS (DETALLES)
+// LOGICA DE CARGA DE PRODUCTOS
 // ==========================================
 bool cargarProductosEnPedido(Pedido &regPedido, int &cantidadDetallesInicial) {
     ArchivoProducto arcProducto("Productos.dat");
     ArchivoDetallePedido arcDetalle("DetallesPedidos.dat");
 
-    // Verificamos si hay mercadería para vender antes de empezar.
     if(!arcProducto.hayProductosConEstadoEliminado(false)){
-        cout << "No hay productos activos disponibles." << endl;
+        imprimirMensajeError("No hay productos activos disponibles.");
         return false;
     }
 
-    bool seAgregoProducto = false; // Bandera para saber si al menos se cargó un item.
-    cout << endl << "-------- AGREGAR PRODUCTOS AL PEDIDO --------" << endl;
+    bool seAgregoProducto = false;
 
-    // Bucle para agregar múltiples productos al mismo pedido
     while(true){
-        cout << endl << "PRODUCTOS DISPONIBLES: " << endl;
-        arcProducto.listar();
+        limpiarConsola();
+        imprimirTituloDecorado("NUEVO PEDIDO - PASO 3: PRODUCTOS", ANCHO_TABLA_PRODUCTOS);
+
+        // MOSTRAR CARRITO
+        if(seAgregoProducto){
+            rlutil::setColor(PaletaCafe::CREMA);
+            cout << ">>> DETALLE ACTUAL DEL PEDIDO (CARRITO)" << endl;
+            mostrarTablaDetallesActuales(regPedido.getIdPedido());
+
+            rlutil::setColor(PaletaCafe::EXITO); // Verde
+            cout << "   SUBTOTAL ACUMULADO: $ " << fixed << setprecision(2) << regPedido.getSubtotal() << endl;
+            restaurarColor();
+            cout << endl;
+        }
+
+        // MOSTRAR CATALOGO
+        rlutil::setColor(PaletaCafe::CREMA);
+        cout << ">>> CATALOGO DE PRODUCTOS:" << endl;
+        listarProductosParaSeleccion();
 
         cout << endl;
-        int idProducto = ingresarEntero("Seleccione ID Producto (0 para terminar): ");
+        int idProducto = ingresarEntero("Seleccione ID Producto (0 para TERMINAR): ");
 
-        // Condición de salida del bucle de carga
         if (idProducto == 0){
             if(!seAgregoProducto){
-                // Si intenta salir sin comprar nada, preguntamos si cancela todo.
                 char cancelar;
-                cout << "No cargo productos. Desea cancelar el pedido? (S/N): ";
+                rlutil::setColor(PaletaCafe::ADVERTENCIA);
+                cout << "El pedido esta vacio. Desea cancelarlo? (S/N): ";
                 cin >> cancelar;
+                restaurarColor();
                 if(cancelar == 'S' || cancelar == 's'){
-                    // Si cancela, borramos cualquier detalle que haya quedado "huerfano" en el archivo.
                     arcDetalle.restaurarCantidadRegistros(cantidadDetallesInicial);
                     return false;
                 }
                 continue;
             }
-            break; // Salida exitosa del bucle
+            break;
         }
 
-        // --- VALIDACIONES DE NEGOCIO ---
         int posProd = arcProducto.buscarRegistro(idProducto);
         if(posProd == -1){
-            imprimirMensajeError("ID inexistente."); pausarConsola(); limpiarConsola(); continue;
+            imprimirMensajeError("ID inexistente.");
+            Sleep(1500); // Pausa automatica
+            continue;
         }
 
         Producto regProd = arcProducto.leerRegistro(posProd);
-        // Validamos estado lógico (eliminado) y físico (stock)
         if (regProd.getEliminado() || regProd.getStock() <= 0) {
-             imprimirMensajeError("Producto eliminado o sin stock."); pausarConsola(); limpiarConsola(); continue;
+            imprimirMensajeError("Producto no disponible (Eliminado o Sin Stock).");
+            Sleep(1100); // Pausa automatica
+            continue;
         }
 
-        cout << "Seleccionado: " << regProd.getNombre() << " | Stock: " << regProd.getStock() << endl;
-        int cantidad = ingresarEntero("Ingrese cantidad: ");
+        cout << endl;
+        rlutil::setColor(PaletaCafe::BASE); lineaSimple(60);
+        rlutil::setColor(PaletaCafe::CREMA);
+        cout << " Seleccionado: " << regProd.getNombre() << endl;
+        cout << " Precio: $" << regProd.getPrecio() << " | Stock Disp: " << regProd.getStock() << endl;
+        rlutil::setColor(PaletaCafe::BASE); lineaSimple(60); restaurarColor();
+
+        int cantidad = ingresarEntero("Ingrese cantidad a llevar: ");
 
         if (cantidad <= 0 || cantidad > regProd.getStock()){
-           imprimirMensajeError("Cantidad invalida o stock insuficiente."); pausarConsola(); limpiarConsola(); continue;
+            imprimirMensajeError("Cantidad invalida o stock insuficiente.");
+            Sleep(1500); // Pausa automatica
+            continue;
         }
 
-        // --- LÓGICA DE DETALLE: ¿NUEVO O EXISTENTE? ---
-        // Verificamos si este producto YA fue agregado en ESTE mismo pedido anteriormente.
-        // Esto evita tener dos líneas iguales (ej: "Café x1" y luego "Café x1").
+        // AGREGAR / ACTUALIZAR DETALLE
         int posDetalleExistente = arcDetalle.buscarDetallePorPedidoYProducto(regPedido.getIdPedido(), idProducto);
         float subtotalItem = 0;
 
         if (posDetalleExistente != -1) {
-            // CASO 1: El producto ya estaba en el pedido -> ACTUALIZAMOS CANTIDAD
             DetallePedido detalle = arcDetalle.leerRegistro(posDetalleExistente);
             int nuevaCant = detalle.getCantidad() + cantidad;
 
-            // Re-validamos stock con la suma total acumulada
             if (nuevaCant > regProd.getStock()) {
-                 imprimirMensajeError("La suma total supera el stock disponible."); pausarConsola();
+                 imprimirMensajeError("La suma total supera el stock disponible.");
+                 Sleep(1500);
                  continue;
             }
 
             detalle.setCantidad(nuevaCant);
-
-            // Sobreescribimos el registro del detalle en el archivo
             if(arcDetalle.modificarRegistro(detalle, posDetalleExistente)){
                 subtotalItem = regProd.getPrecio() * cantidad;
-                regPedido.setSubtotal(regPedido.getSubtotal() + subtotalItem); // Actualizamos el total del pedido padre
-
-                // IMPORTANTE: Descontamos el stock YA MISMO para evitar vender lo que no hay si el bucle sigue.
-                actualizarStockProducto(idProducto, cantidad, false); // false = restar stock
-
-                cout << "Cantidad actualizada." << endl;
+                regPedido.setSubtotal(regPedido.getSubtotal() + subtotalItem);
+                actualizarStockProducto(idProducto, cantidad, false);
+                imprimirMensajeExito("Cantidad actualizada en el carrito.");
                 seAgregoProducto = true;
             }
         } else {
-            // CASO 2: Producto nuevo en el pedido -> CREAMOS NUEVO REGISTRO
             int idDetalle = arcDetalle.contarRegistros() + 1;
             DetallePedido nuevoDetalle(idDetalle, regPedido.getIdPedido(), idProducto, cantidad, regProd.getPrecio());
 
-            // Grabamos el nuevo detalle al final del archivo
             if (arcDetalle.grabarRegistro(nuevoDetalle)) {
                 subtotalItem = regProd.getPrecio() * cantidad;
                 regPedido.setSubtotal(regPedido.getSubtotal() + subtotalItem);
-
-                actualizarStockProducto(idProducto, cantidad, false); // false = restar stock
-
-                cout << "Producto agregado." << endl;
+                actualizarStockProducto(idProducto, cantidad, false);
+                imprimirMensajeExito("Producto agregado al carrito.");
                 seAgregoProducto = true;
             }
         }
-        pausarConsola();
-        limpiarConsola();
+
+        // MEJORA: Pausa automatica de 1.5 seg en lugar de pedir Enter
+        // Esto permite leer "Producto agregado" y que la pantalla se limpie sola
+        Sleep(1500);
     }
     return seAgregoProducto;
 }
 
 // ==========================================
-// ANULAR PEDIDO (BAJA LÓGICA + DEVOLUCIÓN DE STOCK)
+// SELECCIONADORES VISUALES (CLIENTE/EMPLEADO)
 // ==========================================
+
+void listarClientesParaSeleccion() {
+    ArchivoCliente arc("Clientes.dat");
+
+    rlutil::setColor(PaletaCafe::BASE);
+    lineaDoble(ANCHO_TABLA_CLIENTES);
+    imprimirFilaCliente("ID", "NOMBRE", "APELLIDO", "TELEFONO", "MAIL");
+    rlutil::setColor(PaletaCafe::BASE);
+    lineaSimple(ANCHO_TABLA_CLIENTES);
+
+    int n = arc.contarRegistros();
+    for(int i=0; i<n; i++){
+        Cliente c = arc.leerRegistro(i);
+        if(!c.getEliminado()){
+            char sId[10];
+            sprintf(sId, "%d", c.getId());
+            imprimirFilaCliente(sId, c.getNombre(), c.getApellido(), c.getTelefono(), c.getMail());
+        }
+    }
+    rlutil::setColor(PaletaCafe::BASE);
+    lineaDoble(ANCHO_TABLA_CLIENTES);
+    restaurarColor();
+}
+
+int seleccionarClienteValido() {
+    ArchivoCliente arc("Clientes.dat");
+    if (!arc.hayClientesConEstadoEliminado(false)){
+        imprimirMensajeError("No hay clientes activos para seleccionar.");
+        return -1;
+    }
+
+    rlutil::setColor(PaletaCafe::CREMA);
+    cout << ">>> LISTADO DE CLIENTES DISPONIBLES:" << endl;
+    listarClientesParaSeleccion();
+    cout << endl;
+
+    int id = ingresarEntero("Seleccione ID Cliente: ");
+    int pos = arc.buscarRegistro(id);
+
+    if (pos != -1 && !arc.leerRegistro(pos).getEliminado()) return id;
+
+    imprimirMensajeError("Cliente invalido o inexistente.");
+    pausarConsola("");
+    return -1;
+}
+
+void listarEmpleadosParaSeleccion() {
+    ArchivoEmpleado arc("Empleados.dat");
+
+    rlutil::setColor(PaletaCafe::BASE);
+    lineaDoble(ANCHO_TABLA_EMPLEADOS);
+    imprimirFilaEmpleado("ID", "NOMBRE", "APELLIDO", "TELEFONO", "MAIL", "PUESTO");
+    rlutil::setColor(PaletaCafe::BASE);
+    lineaSimple(ANCHO_TABLA_EMPLEADOS);
+
+    int n = arc.contarRegistros();
+    for(int i=0; i<n; i++){
+        Empleado e = arc.leerRegistro(i);
+        if(!e.getEliminado()){
+            char sId[10];
+            sprintf(sId, "%d", e.getId());
+            imprimirFilaEmpleado(sId, e.getNombre(), e.getApellido(), e.getTelefono(), e.getMail(), e.getPuesto());
+        }
+    }
+    rlutil::setColor(PaletaCafe::BASE);
+    lineaDoble(ANCHO_TABLA_EMPLEADOS);
+    restaurarColor();
+}
+
+int seleccionarEmpleadoValido() {
+    ArchivoEmpleado arc("Empleados.dat");
+    if (!arc.hayEmpleadosConEstadoEliminado(false)){
+        imprimirMensajeError("No hay empleados activos.");
+        return -1;
+    }
+
+    rlutil::setColor(PaletaCafe::CREMA);
+    cout << ">>> LISTADO DE EMPLEADOS DISPONIBLES:" << endl;
+    listarEmpleadosParaSeleccion();
+    cout << endl;
+
+    int id = ingresarEntero("Seleccione ID Empleado: ");
+    int pos = arc.buscarRegistro(id);
+
+    if (pos != -1 && !arc.leerRegistro(pos).getEliminado()) return id;
+
+    imprimirMensajeError("Empleado invalido.");
+    pausarConsola("");
+    return -1;
+}
+
+// ==========================================
+// FUNCIONES VISUALES (TABLAS)
+// ==========================================
+
+void listarProductosParaSeleccion() {
+    ArchivoProducto arc("Productos.dat");
+
+    rlutil::setColor(PaletaCafe::BASE);
+    lineaDoble(ANCHO_TABLA_PRODUCTOS);
+    imprimirFilaProducto("ID", "NOMBRE", "PRECIO ($)", "STOCK");
+    rlutil::setColor(PaletaCafe::BASE);
+    lineaSimple(ANCHO_TABLA_PRODUCTOS);
+
+    int n = arc.contarRegistros();
+    for(int i=0; i<n; i++){
+        Producto p = arc.leerRegistro(i);
+        if(!p.getEliminado()){
+            char sId[10], sPrecio[20], sStock[10];
+            sprintf(sId, "%d", p.getIdProducto());
+            sprintf(sPrecio, "%.2f", p.getPrecio());
+            sprintf(sStock, "%d", p.getStock());
+
+            imprimirFilaProducto(sId, p.getNombre(), sPrecio, sStock);
+        }
+    }
+    rlutil::setColor(PaletaCafe::BASE);
+    lineaDoble(ANCHO_TABLA_PRODUCTOS);
+    restaurarColor();
+}
+
+void mostrarTablaDetallesActuales(int idPedido) {
+    ArchivoDetallePedido arcDet("DetallesPedidos.dat");
+    ArchivoProducto arcProd("Productos.dat");
+
+    const int ANCHO_CARRITO = 68;
+
+    rlutil::setColor(PaletaCafe::BASE);
+    lineaDoble(ANCHO_CARRITO);
+
+    rlutil::setColor(PaletaCafe::ESPUMA);
+    cout << "|| " << left << setw(25) << "PRODUCTO"
+         << " | " << right << setw(5) << "CANT"
+         << " | " << right << setw(10) << "P.UNIT"
+         << " | " << right << setw(12) << "SUBTOTAL" << " ||" << endl;
+
+    rlutil::setColor(PaletaCafe::BASE);
+    lineaSimple(ANCHO_CARRITO);
+
+    int n = arcDet.contarRegistros();
+    for(int i=0; i<n; i++){
+        DetallePedido d = arcDet.leerRegistro(i);
+        if(d.getIdPedido() == idPedido){
+            int posP = arcProd.buscarRegistro(d.getIdProducto());
+            Producto p = arcProd.leerRegistro(posP);
+
+            float sub = d.getCantidad() * d.getPrecioUnitario();
+
+            rlutil::setColor(PaletaCafe::BASE); cout << "|| ";
+            rlutil::setColor(PaletaCafe::ESPUMA);
+            cout << left << setw(25) << p.getNombre()
+                 << " | " << right << setw(5) << d.getCantidad()
+                 << " | " << right << setw(10) << fixed << setprecision(2) << d.getPrecioUnitario()
+                 << " | " << right << setw(12) << sub;
+            rlutil::setColor(PaletaCafe::BASE); cout << " ||" << endl;
+        }
+    }
+    rlutil::setColor(PaletaCafe::BASE);
+    lineaDoble(ANCHO_CARRITO);
+    restaurarColor();
+}
+
+// ==========================================
+// FUNCIONES RESTANTES (ANULAR, LISTAR, ETC)
+// ==========================================
+
 void anularPedido () {
     ArchivoPedido arcPedido("Pedidos.dat");
     cout << "---------- ANULAR PEDIDO ----------" << endl;
 
     if(!arcPedido.hayPedidosConEstado(false)){
-        cout << "No hay pedidos activos." << endl; return;
+        imprimirMensajeError("No hay pedidos activos."); return;
     }
 
     listarPedidos();
@@ -284,12 +483,12 @@ void anularPedido () {
     int pos = arcPedido.buscarRegistro(idAnular);
 
     if (pos == -1){
-        cout << "Pedido no encontrado." << endl; return;
+        imprimirMensajeError("Pedido no encontrado."); return;
     }
 
     Pedido regPedido = arcPedido.leerRegistro(pos);
     if (regPedido.getEliminado()){
-        cout << "El pedido ya esta anulado." << endl; return;
+        imprimirMensajeError("El pedido ya esta anulado."); return;
     }
 
     cout << endl << "Detalle del pedido a anular:" << endl;
@@ -298,107 +497,47 @@ void anularPedido () {
     lineaSimple(ANCHO_MENU);
 
     char conf;
-    cout << "Seguro desea anular? (S/N): ";
-    cin >> conf;
+    cout << "Seguro desea anular? (S/N): "; cin >> conf;
 
     if (conf == 'S' || conf == 's'){
         cout << "Restaurando stock..." << endl;
-
-        // 1. Devolver el stock de todos los productos involucrados en este pedido.
         revertirCambiosStock(idAnular);
 
-        // 2. Marcar el pedido como eliminado (Baja lógica).
         regPedido.setEliminado(true);
-
-        // 3. Guardar el cambio de estado en el archivo.
         if (arcPedido.modificarRegistro(regPedido, pos)){
-            cout << "Pedido anulado exitosamente." << endl;
+            imprimirMensajeExito("Pedido anulado exitosamente.");
         } else {
-            cout << "Error al actualizar estado del pedido." << endl;
+            imprimirMensajeError("Error al actualizar estado.");
         }
     }
 }
 
-// ==========================================
-// FUNCIONES AUXILIARES (STOCK & SELECCION)
-// ==========================================
-
-// Función genérica para sumar o restar stock.
-// idProducto: Qué modificamos.
-// cantidad: Cuánto modificamos.
-// devolverStock: true = SUMAR (Anular), false = RESTAR (Vender).
+// Helpers de stock y validacion
 void actualizarStockProducto(int idProducto, int cantidad, bool devolverStock) {
     ArchivoProducto arc("Productos.dat");
     int pos = arc.buscarRegistro(idProducto);
-
     if (pos != -1) {
         Producto p = arc.leerRegistro(pos);
         int stockActual = p.getStock();
-
-        if (devolverStock) {
-            p.setStock(stockActual + cantidad); // Devolución
-        } else {
-            p.setStock(stockActual - cantidad); // Venta
-        }
-
-        // Sobreescribimos el producto actualizado en el archivo
+        if (devolverStock) p.setStock(stockActual + cantidad);
+        else p.setStock(stockActual - cantidad);
         arc.modificarRegistro(p, pos);
     }
 }
 
-// Recorre TODOS los detalles buscando los que pertenecen a un pedido específico
-// para devolver el stock de cada uno. Esencial para anulaciones.
 void revertirCambiosStock(int idPedido) {
     ArchivoDetallePedido arcDetalle("DetallesPedidos.dat");
     int total = arcDetalle.contarRegistros();
-
-    // Búsqueda secuencial en el archivo de detalles
     for(int i=0; i<total; i++){
         DetallePedido det = arcDetalle.leerRegistro(i);
-
-        // Si el detalle pertenece al pedido que estamos anulando...
         if(det.getIdPedido() == idPedido){
-            // Llamamos a la función de stock con 'true' para devolver esa cantidad.
             actualizarStockProducto(det.getIdProducto(), det.getCantidad(), true);
         }
     }
 }
 
-// Helper para validar existencia y estado de Cliente en una sola llamada.
-int seleccionarClienteValido() {
-    ArchivoCliente arc("Clientes.dat");
-    if (!arc.hayClientesConEstadoEliminado(false)){
-        cout << "No hay clientes activos." << endl; return -1;
-    }
-    cout << "CLIENTES DISPONIBLES:" << endl;
-    arc.listar();
-    int id = ingresarEntero("Seleccione ID Cliente: ");
-    int pos = arc.buscarRegistro(id);
-
-    // Validamos: Que exista (pos != -1) y que NO esté eliminado.
-    if (pos != -1 && !arc.leerRegistro(pos).getEliminado()) return id;
-
-    imprimirMensajeError("Cliente invalido."); pausarConsola();
-    return -1;
-}
-
-int seleccionarEmpleadoValido() {
-    ArchivoEmpleado arc("Empleados.dat");
-    if (!arc.hayEmpleadosConEstadoEliminado(false)){
-        cout << "No hay empleados activos." << endl; return -1;
-    }
-    cout << "EMPLEADOS DISPONIBLES:" << endl;
-    arc.listar();
-    int id = ingresarEntero("Seleccione ID Empleado: ");
-    int pos = arc.buscarRegistro(id);
-    if (pos != -1 && !arc.leerRegistro(pos).getEliminado()) return id;
-
-    imprimirMensajeError("Empleado invalido."); pausarConsola();
-    return -1;
-}
-
 // ==========================================
-// FUNCIONES DE CONSULTA Y LISTADO
+// VISUALIZACION
 // ==========================================
 
 void listarPedidos() {
@@ -408,21 +547,15 @@ void listarPedidos() {
     int cant = arcPedido.contarRegistros();
     if(cant == 0){ cout << "Sin registros." << endl; return; }
 
-    // Usamos memoria dinámica (vector) para cargar los pedidos y poder ordenarlos
-    // sin modificar el archivo físico (que tiene orden de carga).
     Pedido *vector = new Pedido[cant];
     int validos = 0;
-
-    // Carga del vector en memoria
     for(int i=0; i<cant; i++){
         Pedido p = arcPedido.leerRegistro(i);
         if(p.getIdPedido() != -1) vector[validos++] = p;
     }
 
-    // Ordenamiento en memoria (Burbujeo por fecha)
     if(validos > 0) ordenarPedidosPorFecha(vector, validos);
 
-    // Muestra Pedidos Activos
     cout << endl << ">>> PEDIDOS ACTIVOS" << endl;
     mostrarEncabezadoTablaPedidos();
     bool hayActivos = false;
@@ -435,7 +568,6 @@ void listarPedidos() {
     if (!hayActivos) cout << "|| (No hay pedidos activos)" << endl;
     lineaDoble(ANCHO_MENU);
 
-    // Muestra Pedidos Anulados
     cout << endl << ">>> PEDIDOS ANULADOS" << endl;
     mostrarEncabezadoTablaPedidos();
     bool hayAnulados = false;
@@ -448,8 +580,39 @@ void listarPedidos() {
     if (!hayAnulados) cout << "|| (No hay pedidos anulados)" << endl;
     lineaDoble(ANCHO_MENU);
 
-
     delete[] vector;
+}
+
+void mostrarEncabezadoTablaPedidos() {
+    rlutil::setColor(PaletaCafe::BASE);
+    lineaDoble(ANCHO_MENU);
+    imprimirFilaPedido("ID", "FECHA", "ID CLI", "ID EMP", "TOTAL ($)");
+    rlutil::setColor(PaletaCafe::BASE);
+    lineaSimple(ANCHO_MENU);
+    restaurarColor();
+}
+
+void mostrarFilaPedido(Pedido p) {
+    char sId[15], sFecha[15], sCli[15], sEmp[15], sTotal[20];
+    Fecha f = p.getFecha();
+
+    sprintf(sId, "%d", p.getIdPedido());
+    sprintf(sFecha, "%02d/%02d/%04d", f.getDia(), f.getMes(), f.getAnio());
+    sprintf(sCli, "%d", p.getIdCliente());
+    sprintf(sEmp, "%d", p.getIdEmpleado());
+    sprintf(sTotal, "%.2f", p.getTotal());
+
+    imprimirFilaPedido(sId, sFecha, sCli, sEmp, sTotal);
+}
+
+void ordenarPedidosPorFecha(Pedido vector[], int cantidad){
+    for(int i=0; i<cantidad-1; i++){
+        for(int j=i+1; j<cantidad; j++){
+            if(vector[j].getFecha() < vector[i].getFecha()){
+                Pedido aux = vector[i]; vector[i] = vector[j]; vector[j] = aux;
+            }
+        }
+    }
 }
 
 void menuConsultasPedidos(){
@@ -461,24 +624,20 @@ void menuConsultasPedidos(){
         cout << "1. POR RANGO DE FECHAS" << endl;
         cout << "2. POR CLIENTE" << endl;
         cout << "3. POR EMPLEADO" << endl;
-        rlutil::setColor(PaletaCafe::BASE);
-        lineaSimple(ANCHO_MENU);
-        rlutil::setColor(PaletaCafe::ESPUMA);
-        cout << "0. VOLVER" << endl;
-        rlutil::setColor(PaletaCafe::BASE);
-        lineaDoble(ANCHO_MENU);
+        rlutil::setColor(PaletaCafe::BASE); lineaSimple(ANCHO_MENU);
+        rlutil::setColor(PaletaCafe::ESPUMA); cout << "0. VOLVER" << endl;
+        rlutil::setColor(PaletaCafe::BASE); lineaDoble(ANCHO_MENU);
         restaurarColor();
-
 
         opcion = ingresarEntero("OPCION: ");
         limpiarConsola();
+
         switch(opcion){
             case 1: consultaPedidosPorRangoFechas(); break;
             case 2: consultaPedidosPorCliente(); break;
             case 3: consultaPedidosPorEmpleado(); break;
             case 0: return;
-            default: imprimirMensajeError("Incorrecto.");
-            break;
+            default: imprimirMensajeError("Incorrecto."); break;
         }
         pausarConsola();
     }
@@ -492,7 +651,7 @@ void consultaPedidosPorRangoFechas(){
     cout << "Desde: " << endl; Fecha f1; f1.Cargar();
     cout << endl << "Hasta: " << endl; Fecha f2; f2.Cargar();
 
-    if(f2 < f1) { cout << "Rango invalido." << endl; return; }
+    if(f2 < f1) { imprimirMensajeError("Rango invalido."); return; }
 
     cout << endl;
     mostrarEncabezadoTablaPedidos();
@@ -541,39 +700,6 @@ void consultaPedidosPorEmpleado(){
     lineaSimple(ANCHO_MENU);
 }
 
-// ==========================================
-// UTILERIAS DE VISUALIZACION
-// ==========================================
-
-void mostrarEncabezadoTablaPedidos() {
-    lineaDoble(ANCHO_MENU);
-    imprimirFilaPedido("ID", "FECHA", "ID CLI", "ID EMP", "TOTAL ($)");
-    lineaSimple(ANCHO_MENU);
-}
-
-void mostrarFilaPedido(Pedido p) {
-    char sId[15], sFecha[15], sCli[15], sEmp[15], sTotal[20];
-    Fecha f = p.getFecha();
-
-    sprintf(sId, "%d", p.getIdPedido());
-    sprintf(sFecha, "%02d/%02d/%04d", f.getDia(), f.getMes(), f.getAnio());
-    sprintf(sCli, "%d", p.getIdCliente());
-    sprintf(sEmp, "%d", p.getIdEmpleado());
-    sprintf(sTotal, "$ %.2f", p.getTotal());
-
-    imprimirFilaPedido(sId, sFecha, sCli, sEmp, sTotal);
-}
-
-void ordenarPedidosPorFecha(Pedido vector[], int cantidad){
-    for(int i=0; i<cantidad-1; i++){
-        for(int j=i+1; j<cantidad; j++){
-            if(vector[j].getFecha() < vector[i].getFecha()){
-                Pedido aux = vector[i]; vector[i] = vector[j]; vector[j] = aux;
-            }
-        }
-    }
-}
-
 void verDetallePedido(){
     ArchivoPedido arcP("Pedidos.dat");
     ArchivoDetallePedido arcD("DetallesPedidos.dat");
@@ -582,7 +708,7 @@ void verDetallePedido(){
 
     int id = ingresarEntero("Ingrese ID Pedido: ");
     int pos = arcP.buscarRegistro(id);
-    if(pos == -1){ cout << "No existe." << endl; return; }
+    if(pos == -1){ imprimirMensajeError("No existe."); return; }
 
     Pedido p = arcP.leerRegistro(pos);
     cout << endl;

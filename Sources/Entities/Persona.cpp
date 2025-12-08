@@ -5,6 +5,9 @@
 #include "../../Headers/Entities/Persona.h"
 #include "../../Headers/Utilidades/Validaciones.h"
 #include "../../Headers/Utilidades/Tablas.h"
+#include"../../Headers/Utilidades/Estilos.h"
+
+#include "../../Headers/Utilidades/rlutil.h"
 
 
 using namespace std;

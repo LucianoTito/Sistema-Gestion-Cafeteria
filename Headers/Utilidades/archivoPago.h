@@ -1,9 +1,9 @@
 #pragma once
+#include "../../Headers/Persistence/ArchivoPagos.h"
+#include "../../Headers/Entities/Pedido.h"
 
-#include "../Entities/Pedido.h"
-#include "../Entities/Pagos.h"
-#include "../Persistence/ArchivoPagos.h"
+// Esta función sí devuelve bool porque retorna éxito o fallo
+bool registrarPagoParaPedido(ArchivoPagos& archivoPagos, Pedido& pedido);
 
-// Funciones auxiliares para centralizar la gestión de pagos.
-bool registrarPagoParaPedido(ArchivoPagos& arcPagos, const Pedido& pedido);
-bool mostrarPagoDePedido(ArchivoPagos& arcPagos, int idPedido);
+// CORRECCIÓN: Cambiado de 'bool' a 'void' para coincidir con archivoPago.cpp
+void mostrarPagoDePedido(ArchivoPagos& archivoPagos, int idPedido);

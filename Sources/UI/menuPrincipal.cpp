@@ -10,6 +10,7 @@
 #include "../../Headers/UI/configuraciones.h"
 #include "../../Headers/Utilidades/Validaciones.h"
 #include "../../Headers/Utilidades/Tablas.h"
+#include "../../Headers/Utilidades/Estilos.h"
 
 using namespace std;
 
@@ -92,7 +93,7 @@ void menuPrincipal() {
                 break;
             case 0:
                 lineaDoble(ANCHO_MENU_PPAL);
-                imprimirMensajeOk("Cerrando el sistema... Hasta luego!");
+                imprimirMensajeExito("Cerrando el sistema... Hasta luego!");
                 lineaDoble(ANCHO_MENU_PPAL);
                 return;
             default:

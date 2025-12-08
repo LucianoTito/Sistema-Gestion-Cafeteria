@@ -6,6 +6,7 @@
 #include "../../Headers/Persistence/ArchivoEmpleado.h"
 #include "../../Headers/Utilidades/Validaciones.h"
 #include "../../Headers/Utilidades/Tablas.h"
+#include "../../Headers/Utilidades/Estilos.h"
 
 using namespace std;
 
