@@ -32,7 +32,7 @@ El objetivo fue simular un entorno de producción donde la integridad de los dat
 
 > *Visualización del flujo de toma de pedidos y generación de tickets.*
 
-![Demo del Sistema](Assets/Sistema_de_gestion_Basti_Cafe.mp4)
+![Demo del Sistema](Assets/Sistema_de_gestion_Basti_Cafe.gif)
 
 
 ---
