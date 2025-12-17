@@ -32,8 +32,8 @@ El objetivo fue simular un entorno de producción donde la integridad de los dat
 
 > *Visualización del flujo de toma de pedidos y generación de tickets.*
 
-![Demo del Sistema](https://via.placeholder.com/800x400?text=AQUI+VA+TU+GIF+DEL+SISTEMA+FUNCIONANDO)
-*(Nota: Reemplaza este link por la URL de tu GIF real)*
+![Demo del Sistema](Assets/Sistema_de_gestion_Basti_Cafe.mp4)
+
 
 ---
 

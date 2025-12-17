@@ -19,6 +19,7 @@ const int ANCHO_MENU_PPAL = 60;
 
 void menuPrincipal() {
 
+
     int opcion;
 
     while (true) {
@@ -28,7 +29,7 @@ void menuPrincipal() {
 
         imprimirSubtituloDecorado("Aromas, sabores y buena atencion", ANCHO_MENU_PPAL);
         cout << endl;
-
+        imprimirBannerCafe();
         // --- MODULOS OPERATIVOS ---
         rlutil::setColor(PaletaCafe::CREMA);
         cout << "   1.   GESTION DE PRODUCTOS  " << endl << endl;
@@ -66,8 +67,6 @@ void menuPrincipal() {
 
 
         limpiarConsola();
-
-
 
 
         bool mostrarPausa = false;

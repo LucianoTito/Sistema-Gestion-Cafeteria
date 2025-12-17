@@ -8,7 +8,7 @@ using namespace std;
 
 void configurarConsola() {
     //rlutil::saveDefaultColor();
-    // rlutil::setWindowTitle("SISTEMA DE GESTION"); // Comentado por si falla en tu version
+    // rlutil::setWindowTitle("SISTEMA DE GESTION"); //
     rlutil::setColor(PaletaCafe::TEXTO);
     rlutil::hidecursor();
 }
