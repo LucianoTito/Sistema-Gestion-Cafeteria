@@ -120,7 +120,7 @@ void listarEmpleados(bool mostrarEliminados) {
             hayRegistros = true;
         }
     }
-    lineaSimple(118);
+    lineaSimple(145);
 
     if (!hayRegistros) cout << "No hay empleados " << (mostrarEliminados ? "eliminados" : "activos") << " para mostrar." << endl;
 }
@@ -157,7 +157,7 @@ void listarEmpleadosOrdenadosPorApellido() {
     for(int i=0; i<activos; i++){
         mostrarFilaEmpleado(registros[i]);
     }
-    lineaSimple(118);
+    lineaSimple(135);
 
     delete[] registros;
 }
@@ -320,10 +320,10 @@ int buscarEmpleadoID(ArchivoEmpleado& arc, bool buscarEliminados) {
 }
 
 void mostrarEncabezadoEmpleados() {
-    lineaDoble(118);
+    lineaDoble(145);
     // Usamos las columnas corregidas en Tablas.cpp
     imprimirFilaEmpleado("ID", "NOMBRE", "APELLIDO", "TELEFONO", "MAIL", "PUESTO");
-    lineaSimple(118);
+    lineaSimple(145);
 }
 
 void mostrarFilaEmpleado(Empleado e) {

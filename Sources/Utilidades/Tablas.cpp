@@ -61,7 +61,7 @@ void imprimirFilaPago(const char* idPago, const char* idPedido, const char* fech
 }
 
 void imprimirFilaEmpleado(const char* id, const char* nombre, const char* apellido, const char* telefono, const char* mail, const char* puesto) {
-    const int wId = 6; const int wNombre = 15; const int wApellido = 15; const int wTel = 15; const int wMail = 35; const int wPuesto = 15;
+    const int wId = 6; const int wNombre = 23; const int wApellido = 21; const int wTel = 15; const int wMail = 35; const int wPuesto = 22;
     rlutil::setColor(PaletaCafe::BASE); cout << "|| ";
     rlutil::setColor(PaletaCafe::ESPUMA); cout << left << setw(wId) << id;
     rlutil::setColor(PaletaCafe::BASE); cout << " | ";
@@ -74,7 +74,7 @@ void imprimirFilaEmpleado(const char* id, const char* nombre, const char* apelli
     rlutil::setColor(PaletaCafe::ESPUMA); cout << left << setw(wMail) << mail;
     rlutil::setColor(PaletaCafe::BASE); cout << " | ";
     rlutil::setColor(PaletaCafe::ESPUMA); cout << left << setw(wPuesto) << puesto;
-    rlutil::setColor(PaletaCafe::BASE); cout << " ||";
+    rlutil::setColor(PaletaCafe::BASE); cout << "   ||";
     restaurarColor(); cout << endl;
 }
 

@@ -283,7 +283,7 @@ void listarClientesGenerico(bool mostrarEliminados){
         Cliente c = arc.leerRegistro(i);
         if(c.getEliminado() == mostrarEliminados) mostrarFilaCliente(c);
     }
-    lineaSimple(94);
+    lineaSimple(100);
 }
 
 void listarClientesOrdenadosApellido(){
@@ -303,7 +303,7 @@ void listarClientesOrdenadosApellido(){
     cout << "CLIENTES ORDENADOS POR APELLIDO" << endl;
     mostrarEncabezadoClientes();
     for(int i=0; i<cantidad; i++) mostrarFilaCliente(vector[i]);
-    lineaSimple(94);
+    lineaSimple(100);
 
     delete[] vector;
 }
@@ -349,7 +349,7 @@ void listarClientesConMasPedidos(){
         if(contadores[i] > 0){
             mostrarFilaCliente(clientes[i]);
             cout << right << setw(92) << "^-- Pedidos: " << contadores[i] << endl;
-            lineaSimple(94);
+            lineaSimple(100);
             hubo = true;
         }
     }

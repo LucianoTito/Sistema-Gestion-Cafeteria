@@ -27,12 +27,12 @@ const char* Empleado::getPuesto() { return _puesto; }
 // Setter específico de Empleado
 void Empleado::setPuesto(const char* puesto) {
     if (puesto != nullptr && puesto[0] != '\0') {
-        if (strlen(puesto) < 20) {
+        if (strlen(puesto) < 25) {
             strcpy(_puesto, puesto);
         } else {
             cout << "Nombre del puesto demasiado largo. Se cortara en 19 caracteres." << endl;
-            strncpy(_puesto, puesto, 19);
-            _puesto[19] = '\0'; // Asegura el terminador
+            strncpy(_puesto, puesto, 24);
+            _puesto[24] = '\0'; // Asegura el terminador
         }
     } else {
         cout << "Puesto invalido. Se asignara 'Sin puesto'." << endl;
@@ -43,12 +43,12 @@ void Empleado::setPuesto(const char* puesto) {
 
 // Cargar
 void Empleado::Cargar(int id) {
-    char empleado[20]; // Buffer temporal para el puesto
+    char empleado[25]; // Buffer temporal para el puesto
 
     Persona::Cargar(id);
 
     cout << "Ingrese el puesto del empleado: ";
-cargarCadena(empleado, 20);
+cargarCadena(empleado, 25);
 
 setPuesto(empleado);
 
@@ -73,7 +73,7 @@ void Empleado::MostrarFila(const char* estado){
          << setw(15) << _apellido
          << setw(18) << _telefono
          << setw(45) << _mail
-         << setw(15) << _puesto;
+         << setw(25) << _puesto;
 
     // El estado es opcional y se muestra cuando se requiere distinguir activos/inactivos.
     if(estado != nullptr){
